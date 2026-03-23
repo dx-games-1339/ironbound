@@ -527,22 +527,16 @@ Once a severity tier is selected:
 
 **Generic wound selection (Scratch / Bruise):**
 
-Generic wounds are stackable — no slot conflict. A secondary roll determines the type based on hit type:
-
-| Hit type | More likely |
-|---|---|
-| Bladed / sharp | Scratch |
-| Blunt | Bruise |
-| Piercing | Scratch |
+Generic wounds are stackable — no slot conflicts.
 
 **Starting charges on application:**
 
 | Severity | Starting charges |
 |---|---|
 | Generic (Scratch, Bruise) | 50 |
-| Light | 230 |
-| Medium | 400 |
-| Severe | 600 |
+| Light | 100 |
+| Medium | 150 |
+| Severe | 200 |
 
 When a wound progresses via charge injection (repeat hit to an occupied slot), the wound advances to the next stage and its charge counter resets to that stage's starting value.
 
