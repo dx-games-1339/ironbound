@@ -546,7 +546,7 @@ Incapacitation is a charge-based status effect applied when a character receives
 
 **Initial charge calculation:**
 
-> **initial_charges = min(200, 40 + 20 × (max_health / current_health))**
+> **initial_charges = max(200, 40 + 20 × (max_health / current_health))**
 
 Where:
 - `current_health` — the character's current effective health at the moment of the hit (base health minus all active wound penalties). Must be greater than zero — a character with `current_health ≤ 0` is already dead (see Section 5.3.1) and the incapacitation check does not fire. The incapacitation check is only evaluated when `current_health > 0`.
