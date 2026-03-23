@@ -930,7 +930,7 @@ When selecting which food items to consume during rest, the character prioritise
 
 ### 5.7 Upkeep
 
-Each character requires a gold payment on the first turn of the last day of each in-game month. This is their upkeep — the combined cost of pay, food, and basic supplies needed to keep them in the guild.
+Each character requires a gold payment on the first turn of the last day of each in-game month.
 
 Upkeep is defined as a **per-level rate** for each character, determined when the character is initialised. The actual monthly payment is calculated as:
 
