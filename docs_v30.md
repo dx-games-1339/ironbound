@@ -621,7 +621,7 @@ These three characteristics do nothing passively. They are only relevant when an
 
 **Survival characteristics**
 
-- **Regeneration** — determines how effectively the character recovers from wounds over time. Influences the rate at which wound charges accumulate each turn and how quickly bandaged wounds heal.
+- **Regeneration** — determines how effectively the character recovers from wounds over time. Influences the rate at which wound charges accumulate or deplete each turn.
 - **Movement speed** — determines how quickly the character travels. Used to calculate the number of turns required to move between zones inside a POI and to travel between locations on the global map. A character's effective movement speed can be reduced by wound effects (e.g. leg wounds). When a character's movement speed is reduced to zero they cannot move independently.
 - **Carrying capacity** — each character has a base carrying capacity ranging between 5 and 10 units for human-like characters. This is the character's intrinsic capacity before any backpack bonus is applied. Total effective capacity is higher when a backpack is equipped. See Section 5.3.4 for the full carrying capacity system.
 
