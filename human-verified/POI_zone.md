@@ -22,7 +22,7 @@ Each "task" is an action that might have a target (square shaped slot), might ha
 
 Whether task has a target or not is determined by the task type. All tasks always have an assignee slot but characters may be currently assigned or not assigned to the task.
 
-Task types:
+Task types examples (not exhaustive, see game documentation for a full list of tasks):
 
 - Harvest (has a zone object as a target)
 - Loot (has a zone object as a target)
@@ -46,4 +46,10 @@ Whenever a player hovers over a group its tasks are displayed in the leftmost "G
 Whenever the player clicks on a character portrait - that characters tasks become highlighted in the Group task queue and stay highlighted until the character is deselected and an object from the Zone objects panel which is the target of the current task being performed by that character (if there is one) is highlighted in the Zone objects panel - the Zone objects panel must be scrolled to that highlighted object if necessary. If the character is not assigned to any tasks - nothing happens. Zone objects scrolling only happens once when a player clicks on a character portrait. After that the player can scroll Zone objects panel however he wants. If a player clicks on an already selected character - Zone objects are scrolled to the target of the task that character is assigned to once again.
 
 # Zone objects panel
+
+Zone objects panel must be divided into three main sections:
+
+- Located objects (45% of zone panel height): a list of objects player can interact with
+- Known objects (45% of zone panel height): a list of objects that the player knows exist but didn't yet located, objects from that list render with their names and icons replaced with type-based "known state appearance"
+- Undiscovered (10% of zone panel height): the smallest section of all three, it only holds an explanatory text "There might be unknown objects in this zone. Proceed to exploration in order to uncover them."
 
