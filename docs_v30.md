@@ -1030,7 +1030,7 @@ Additional races may be introduced in future updates. Each new race is defined a
 The player controls a single guild throughout a playthrough. The guild has:
 
 - A **name** (set at game start)
-- A **headquarters city** — assigned at world generation as one of the 3 cities on the map, selected at random. Can be relocated to a different city for a gold cost after the game begins.
+- A **headquarters city** — assigned at world generation as one of the 3 cities on the map, selected at random.
 - A **gold balance** — the primary resource and the loss condition (if gold reaches zero and no recruits are deployed, the guild dissolves)
 - A **roster** of recruits
 - An **inventory** of supplies and equipment stored at HQ
