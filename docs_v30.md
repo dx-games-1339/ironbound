@@ -95,11 +95,11 @@ An Undiscovered POI reverts to nothing if its despawn timer expires before it is
 
 A menu-driven view representing a city and the guild's headquarters when it is based there.
 
-**Navigation:** Clicking a city on the Global Map opens a City Details Panel in the sidebar — identical in structure to the POI Details Panel. The panel displays the city's name, size, and a "never" despawn value (cities never despawn). An **Enter City** button navigates into the City Layout. Cities are always in the Discovered state and the Enter City button is always enabled.
+**Navigation:** Clicking a city on the Global Map opens a City Details Panel — identical in structure to the POI Details Panel. The panel displays the city's name, size, and a "never" despawn value (cities never despawn). An **Enter City** button navigates into the City Layout. Cities are always in the Discovered state and the Enter City button is always enabled.
 
 Each city has a fixed pair of **coordinates** on the global map. These are used to calculate distances and travel times in the same way as POI coordinates.
 
-Each city also has a **size** property (small, medium, or large) assigned at world generation. Size determines the range and quantity of goods available in the city's Market — larger cities stock more items and have a higher chance of rare drops appearing in the weekly rotation (see Section 9.3).
+Each city also has a **size** property (small, medium, or large) assigned at world generation. Size determines the range and quantity of goods available in the city's Market — larger cities stock more items.
 
 **City panels:**
 - **Market** — purchase food, equipment, and weapons. Items are divided into three stock categories (see Section 9.3). The player stages items for purchase in the For Purchase box and confirms the transaction from this panel (see Section 9.5).
