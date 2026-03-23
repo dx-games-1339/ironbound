@@ -125,6 +125,8 @@ Recruits not assigned to a field group can be assigned to one of the following p
 
 A recruit assigned to an HQ task is unavailable for field deployment until reassigned. Task output is calculated each turn based on the number of assigned recruits and their capabilities.
 
+In V1 HQ staff tasks are a placeholder and has no real effect or game logic behind it.
+
 ### 3.3 POI Layout
 
 A view representing the internal structure of a single POI. Accessed by clicking a POI on the Global Map.
