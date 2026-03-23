@@ -1085,37 +1085,36 @@ The codebase must treat player-controlled groups and NPC groups as instances of 
 
 A **group** is a named collection of one or more characters (player-controlled, NPC or animals) that acts as a single unit on the Global Map (only player-controlled Groups) and inside POIs.
 
-- Groups are created and managed in the HQ Group Manager panel
+- Groups are created and managed in the HQ Group Manager panel.
 - A group can contain a maximum of 9 recruits. A player can assign more than one group to the same POI simultaneously, allowing larger operations to be split across multiple groups.
-- Groups move together; individual recruit actions are only available within the Zone Detail Panel
-- A group moves at the speed of its slowest member — if any character in the group has a reduced movement speed (e.g. from a leg wound), the entire group's travel time is calculated using that character's speed
-- Characters in a group do not share carrying capacity — each character holds items independently in their own inventory. The group's effective total capacity is the sum of each member's available space, but items must be assigned to specific characters and cannot exceed individual limits
-- Groups can be split or merged at HQ or inside a POI zone where both groups are present
+- A group moves at the speed of its slowest member — if any character in the group has a reduced movement speed the entire group's travel time is calculated using that character's speed.
+- Characters in a group do not share carrying capacity — each character holds items independently in their own inventory.
+- Groups can be split or merged at HQ or inside a POI zone where both groups are present.
 
 **Daily schedule:**
 
 Each group has a **schedule** — a repeating 6-turn pattern that mirrors the in-game day cycle. Each of the six turn slots can be marked as a **rest turn** or left as an **active turn** by the player.
 
-When a rest turn is reached in the cycle, characters in the group will prefer to rest rather than continue their current activity. If the group has no active task assigned for that turn they automatically perform the Rest action. If a task is in progress when a rest turn arrives the character pauses it and rests instead, resuming on the next active turn.
+When a rest turn is reached in the cycle, characters in the group will prefer to rest rather than continue their current activity. If the group has no active task assigned for that turn they automatically perform the Rest action. If a task is in progress when a rest turn arrives the character continues to perform the action which is already in progress ignoring the Rest schedule.
 
-The default schedule has turn 6 set as the rest turn, matching the movement speed model in Section 5.3.3 — one rest turn per day cycle out of six. The player can adjust the schedule freely: more rest turns slow overall progress but improve wound recovery and fatigue management; fewer rest turns increase output but may cause characters to accumulate fatigue over time.
+The default schedule has turn 6 set as the rest turn. The player can adjust the schedule freely: more rest turns slow overall progress but improve loyalty gains.
 
 Schedules are set at the group level and apply to all members equally. Individual characters do not have separate schedules.
 
 **Group roles:**
 
-A group's role is a label assigned by the player to communicate intent and improve UI clarity. Roles are not mechanically enforced — there is no system restriction preventing a labelled Combat group from scouting, or a Supply group from fighting. However, roles are not purely cosmetic either: the recruits a player places in a group and the equipment they carry determine what the group is actually capable of. A group composed of recruits with high scouting capability and light equipment will perform better at reconnaissance regardless of its label. Role labels exist to help the player manage multiple groups at a glance.
+A group's role is a label assigned by the player to communicate intent and improve UI clarity. Roles are not mechanically enforced — there is no system restriction preventing a labelled Combat group from scouting, or a Supply group from fighting.
 
-- **Scout** — small, lightly equipped, prioritised for reconnaissance and awareness tasks
-- **Combat** — larger, heavily equipped, prioritised for engaging hostile characters
-- **Supply** — carries food and equipment to support deployed groups
-- **Rescue** — dispatched to retrieve incapacitated recruits from inside POIs
+- **Scout**
+- **Combat**
+- **Supply**
+- **Special**
 
 **Group actions log:**
 
 Every group maintains a rolling **actions log** — a record of actions performed by group members and events that affected them. The log retains entries for the last 20 turns and discards older entries automatically. Each log entry records the turn number, the character involved, and a description of the action or event.
 
-The following are logged:
+The following actions are recorded in the log (the list is not exhaustive, this is just an example and more log entries may be required):
 
 - Zone actions performed by any group member (Scout, Rest, Eat, Treat, Gather, etc.) — one entry per execution, not per attempt
 - Damage received by any group member, including the wound applied and its severity
@@ -1129,7 +1128,7 @@ The following are logged:
 
 Player-controlled groups expose the log in the Group panel, always accessible to the player. The log is displayed in reverse chronological order (most recent turn first) and can be scrolled.
 
-NPC-controlled groups maintain the same log structure but their logs are not displayed in normal gameplay. They are accessible exclusively through Dev Mode (see Section 14), where they appear in the same format as player group logs. This allows inspection of NPC behaviour during testing and debugging without exposing it during normal play.
+NPC-controlled groups maintain the same log structure but their logs are not displayed in normal gameplay. They are accessible exclusively through Dev Mode (see Section 14), where they appear in the same format as player group logs.
 
 The log is included in the game state schema (see Section 11.2) and is serialised with the save file so it persists across sessions.
 
