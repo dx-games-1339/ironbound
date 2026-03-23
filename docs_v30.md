@@ -1201,14 +1201,9 @@ Tags are modifiers attached to individual object instances at spawn. An object m
 | Tag | Effect |
 |---|---|
 | **Light source (X%)** | The object emits light. When the object is active or interacted with, the zone's effective light level is calculated as though increased by X%. Multiple light source tags in the same zone stack additively. |
-| **Edible** | The object can be consumed as food. Carries a Food (value) tag indicating how many hunger charges are removed when one unit is consumed. May additionally carry a Delicious (X) tag granting X loyalty when consumed during Rest. Consumed via the Eat action or the Rest action. See Section 5.6.2. |
+| **Food** | The object can be consumed as food. Carries a Food (value) tag indicating how many hunger charges are removed when one unit is consumed. May additionally carry a Delicious (X) tag granting X loyalty when consumed during Rest. Consumed via the Eat action or the Rest action. See Section 5.6.2. |
 | **Toxic** | Contact or consumption applies a Poisoned wound instance to the character. |
-| **Flammable** | The object can be set alight. When burning it gains a Light source tag and may spread fire to adjacent flammable objects. |
-| **Concealment** | Characters hiding near or inside this object receive a bonus to their visibility reduction. |
-| **Locked (condition)** | The object cannot be opened or accessed without satisfying the specified tool condition (e.g. key ≥ 100%). |
 | **Delicious (X)** | When the object is consumed during the Rest action, X is added to the consuming character's loyalty in addition to the standard +1 rest loyalty bonus. Has no effect when consumed via the Eat action outside of rest. |
-| **Fragile** | The object can be destroyed by a single Attack action or by incidental contact during combat. |
-| **Heavy** | The object cannot be moved by a single character. Requires multiple characters or a specific tool condition to move. |
 
 #### 8.4.4 Unknown Object Display
 
