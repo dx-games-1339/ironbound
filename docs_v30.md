@@ -946,7 +946,7 @@ The Greedy trait increases a character's base rate by 10%, applied before the le
 
 Every character has a **race** characteristic assigned at initialisation and fixed for the character's lifetime. Race determines which wound types a character can receive and which other standard status effects apply to them. Characters of the same race share an identical wound table and status effect table.
 
-Race is a data-driven definition — each race specifies its full set of progressive wound sequences, stackable wound types, special wound types, and any race-specific status effects. The damage pipeline (Section 4.9) selects wounds from the character's race wound table when applying damage.
+Race is a data-driven definition — each race specifies its full set of progressive wound sequences, stackable wound types, and any race-specific status effects. The damage pipeline (Section 4.9) selects wounds from the character's race wound table when applying damage.
 
 **Human race — wound table:**
 
