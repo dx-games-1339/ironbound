@@ -629,12 +629,14 @@ These three characteristics do nothing passively. They are only relevant when an
 
 Loyalty represents how willing the character is to remain with their current controller. It ranges from 0 to 30.
 
-Loyalty decreases over time through events such as unpaid upkeep, witnessing the death of companions, or being left in dangerous situations without support. It may increase through positive events such as successful missions, receiving good equipment, or resting in safe conditions.
+Loyalty changes over time through events.
 
-When a character's loyalty reaches 0, two outcomes are possible depending on their location:
+When a character's loyalty reaches 0, two outcomes are possible for a player-controlled character depending on their location:
 
 - **Inside a POI zone** — the character immediately leaves their group and becomes an independent object within the zone. They retain all characteristics, wounds, and equipment. They are no longer under player control but remain present as an interactable and attackable object in the zone.
 - **Outside a POI zone** (travelling or at HQ) — the character deserts. They are removed from the player's roster and group without returning equipment.
+
+NPC characters may decide to leave their faction and form a new one (consisting of only that one NPC whose loyalty reached zero, in that case the NPC starts with a new faction and is 30/30 Loyal to itself there) or join an existing faction (including players).
 
 #### 5.3.3 Movement Speed
 
