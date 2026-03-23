@@ -1166,6 +1166,7 @@ Every object that can appear in a POI zone has the following characteristics. So
 | Characteristic | Description |
 |---|---|
 | **Name** | A display label shown to the player. The name is distinct from the type — it conveys flavour and sets player expectations but has no effect on game logic. Two objects of the same type may have different names (e.g. "crumbling wall" and "stone barricade" are both of type Rock). |
+| **Icon** | An image that is displayed in a square shape for non-living objects (including corpses of the dead characters) or diamond shape for living characters (including animals). |
 | **Type** | A fixed classification that determines which actions can be applied to the object. The type list is defined in Section 8.4.2. |
 | **Size** | A numeric value. Objects with a size small enough to fit within a character's available carrying capacity can be picked up and placed in their inventory using the Take action. |
 | **Visibility** | The faction visibility value at which a new faction's awareness of this object is initialised when they first enter the zone.
