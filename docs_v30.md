@@ -755,6 +755,8 @@ Bandaged wounds retain a modified set of the original wound's effects (reduced p
 
 Lethal wounds cannot be treated — they cause immediate death upon application.
 
+If a character would receive a damage that applies a damage to the wound slot where a bandaged wound exists then the bandaged wound is removed and replaced with a new wound of the corresponding type and corresponding stage at its starting charges (e.g. Bandaged severe arm wound (left) would be replaced with Severe arm wound (left) at its starting charges).
+
 ### 5.4 Dead Characters and Body Persistence
 
 When a character dies, their body is not removed from the game. The body remains in the zone of the POI where the character died as a persistent object in the zone's object list. It follows the same awareness and visibility mechanics as any other object — it can be Undiscovered, Known, or Located depending on the observing faction.
