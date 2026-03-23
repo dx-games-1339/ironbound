@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ironbound</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #04060c;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+/* ── DESIGN TOKENS ── */
+:root {
+  --s0: #04060c; --s1: #080c17; --s2: #0c1020; --s3: #101526; --s4: #151c30; --s5: #1c2438;
+  --b1: #1a2238; --b2: #232e4a; --b3: #2e3e62; --b4: #3d5280;
+  --t1: #edf0f8; --t2: #c0ccde; --t3: #7a8aaa; --t4: #3a4660;
+  --g1: #c8900e; --g2: #e6aa22; --g3: #f5c040;
+  --ok: #3a9850; --okb: #4ec468;
+  --warn: #b07a14; --warnb: #e09a24;
+  --bad: #9a2424; --badb: #cc4444;
+  --fd: 'Cinzel', 'Palatino Linotype', serif;
+  --fb: 'Lora', Georgia, serif;
+  --fm: 'DM Mono', 'Courier New', monospace;
+  --tb-h: 52px;
+  --sb-h: 24px;
+  --panel-w: 420px;
+  --r: 2px;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --t-anim: .22s;
+  --tf: .12s;
+}
+
+/* ── SCREENS ── */
+.screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════════════
+   GAME SCREEN
+══════════════════════════════════════════ */
+#screen-game { background: var(--s0); }
+
+/* ── TOOLBAR ── */
+#toolbar {
+  height: var(--tb-h);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--s4) 0%, var(--s2) 100%);
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 18px;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,.5);
+  gap: 0;
+}
+.tb-brand {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--g3);
+  letter-spacing: .2em;
+  padding-right: 22px;
+  margin-right: 4px;
+  border-right: 1px solid var(--b2);
+  flex-shrink: 0;
+  text-shadow: 0 0 24px rgba(200,160,20,.2);
+}
+.tb-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16px;
+  border-right: 1px solid var(--b1);
+  flex-shrink: 0;
+}
+.tb-stat-label {
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: .22em;
+  color: var(--t4);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.tb-stat-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  letter-spacing: .05em;
+  line-height: 1;
+}
+.tb-stat-value.gold { color: var(--g2); }
+.tb-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.tb-save-btn {
+  height: 30px;
+  padding: 0 14px;
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  color: var(--t4);
+  font-family: var(--fm);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: .16em;
+  cursor: pointer;
+  transition: all var(--tf);
+  border-radius: var(--r);
+}
+.tb-save-btn:hover { border-color: var(--b2); color: var(--t3); background: var(--s3); }
+#btn-end-turn {
+  height: 38px;
+  padding: 0 24px;
+  background: linear-gradient(135deg, rgba(70,42,4,.95), rgba(40,24,2,.95));
+  border: 1px solid var(--g1);
+  color: var(--g2);
+  font-family: var(--fm);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .22em;
+  cursor: pointer;
+  transition: all var(--tf);
+  border-radius: var(--r);
+  white-space: nowrap;
+  box-shadow: 0 0 22px rgba(180,130,8,.08), inset 0 1px 0 rgba(255,210,80,.07);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+#btn-end-turn:hover {
+  background: linear-gradient(135deg, rgba(100,60,5,1), rgba(60,36,3,1));
+  border-color: var(--g3);
+  color: var(--g3);
+  box-shadow: 0 0 32px rgba(200,150,10,.2);
+}
+
+/* ── GAME BODY ── */
+#game-body { flex: 1; position: relative; overflow: hidden; }
+
+/* ── MAP CANVAS ── */
+#map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  display: block;
+}
+#map-canvas.dragging { cursor: grabbing; }
+
+/* ── SIDE PANEL (slides in from right, UI §2) ── */
+#side-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: var(--panel-w);
+  background: var(--s2);
+  border-left: 1px solid var(--b2);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--t-anim) var(--ease);
+  z-index: 50;
+  box-shadow: -10px 0 40px rgba(0,0,0,.55);
+}
+#side-panel.open { transform: translateX(0); }
+/* When panel is open, canvas is constrained (min 20% map visible = 80% panel max) */
+#map-canvas.panel-open {
+  right: var(--panel-w);
+  width: auto;
+}
+
+/* Panel header */
+.sp-hd {
+  height: var(--tb-h);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--s4), var(--s2));
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  gap: 12px;
+}
+.sp-hd-titles { flex: 1; min-width: 0; }
+.sp-hd-name {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--g2);
+  letter-spacing: .1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-hd-sub {
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--t4);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.sp-close {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--t4); font-size: 16px;
+  border: 1px solid transparent; border-radius: var(--r);
+  transition: all var(--tf); flex-shrink: 0;
+}
+.sp-close:hover { color: var(--t2); border-color: var(--b2); background: var(--s4); }
+
+/* Panel body placeholder */
+.sp-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t4);
+  font-size: 11px;
+  letter-spacing: .12em;
+  font-style: italic;
+}
+
+/* ── DETAILS POPUP (fixed bottom-left, UI §6.10) ── */
+#details-popup {
+  position: absolute;
+  bottom: calc(var(--sb-h) + 16px);
+  left: 18px;
+  width: 280px;
+  background: var(--s2);
+  border: 1px solid var(--b2);
+  box-shadow: 0 10px 50px rgba(0,0,0,.65), 0 0 0 1px var(--b1);
+  display: none;
+  z-index: 60;
+  animation: popup-in var(--tf) var(--ease) both;
+}
+@keyframes popup-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.dp-accent-bar { height: 3px; }
+.dp-hd {
+  padding: 13px 16px 10px;
+  background: linear-gradient(180deg, var(--s4), var(--s2));
+  border-bottom: 1px solid var(--b1);
+  position: relative;
+}
+.dp-name {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--g2);
+  margin-bottom: 3px;
+  padding-right: 24px;
+  letter-spacing: .06em;
+  line-height: 1.2;
+}
+.dp-type {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: .22em;
+  color: var(--t4);
+  text-transform: uppercase;
+}
+.dp-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--t4); font-size: 14px;
+  transition: color var(--tf);
+}
+.dp-close:hover { color: var(--t2); }
+.dp-body { padding: 13px 16px; }
+.dp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+.dp-row:last-child { margin-bottom: 0; }
+.dp-label { color: var(--t4); font-weight: 300; letter-spacing: .1em; }
+.dp-value { color: var(--t1); font-weight: 500; }
+.dp-value.ok   { color: var(--okb); }
+.dp-value.muted{ color: var(--t4); }
+.dp-value.warn { color: var(--warnb); }
+.dp-ft {
+  padding: 11px 16px;
+  border-top: 1px solid var(--b1);
+  background: var(--s1);
+}
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 9px 18px;
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  color: var(--t2);
+  font-family: var(--fm);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  cursor: pointer;
+  transition: all var(--tf);
+  border-radius: var(--r);
+  text-align: center;
+}
+.btn:hover { background: var(--s5); border-color: var(--b3); color: var(--t1); }
+.btn.primary { border-color: var(--g1); color: var(--g2); background: rgba(16,10,2,.7); }
+.btn.primary:hover { border-color: var(--g3); color: var(--g3); background: rgba(32,18,2,.9); }
+.btn.sm { padding: 7px 16px; font-size: 10px; }
+.btn.full { width: 100%; }
+
+/* ── STATUS BAR ── */
+#statusbar {
+  height: var(--sb-h);
+  flex-shrink: 0;
+  background: var(--s1);
+  border-top: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 14px;
+  font-size: 9px;
+  font-weight: 300;
+  color: var(--t4);
+  letter-spacing: .07em;
+}
+.sb-val { color: var(--t3); margin-left: 3px; }
+.sb-dot { color: var(--b2); }
+.sb-hint { margin-left: auto; color: var(--t4); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 40px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--s4);
+  border: 1px solid var(--b3);
+  padding: 10px 24px;
+  font-size: 12px;
+  font-family: var(--fb);
+  color: var(--t1);
+  opacity: 0;
+  transition: all .18s;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 999;
+  box-shadow: 0 6px 24px rgba(0,0,0,.6);
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════════
+   DEV PANEL
+══════════════════════════════════════════ */
+#dev-panel {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 240px;
+  background: #030509; border-top: 2px solid #501010;
+  font-family: var(--fm); font-size: 10px;
+  display: none; flex-direction: column; z-index: 9999;
+}
+#dev-panel.open { display: flex; }
+#dev-tb {
+  height: 32px; background: #060810; border-bottom: 1px solid #12181e;
+  display: flex; align-items: center; padding: 0 10px; gap: 6px;
+}
+.dtag { color: #501010; font-size: 9px; letter-spacing: .18em; margin-right: 4px; }
+.dbtn { padding: 3px 10px; background: #0a0e16; border: 1px solid #1a0e0e; color: #904040; font-family: var(--fm); font-size: 9px; cursor: pointer; border-radius: 2px; transition: all .1s; }
+.dbtn:hover { border-color: #501010; color: #c06060; }
+.dbtn.ok { border-color: #0e180e; color: #408040; }
+.dbtn.ok:hover { border-color: #186018; color: #60c060; }
+#dev-body { display: flex; flex: 1; overflow: hidden; }
+#dev-log { flex: 1; overflow-y: auto; padding: 6px 10px; line-height: 1.7; }
+#dev-aside { width: 190px; border-left: 1px solid #12181e; padding: 6px; overflow-y: auto; }
+#dev-aside .dasec { font-size: 8px; letter-spacing: .18em; color: #2a3044; text-transform: uppercase; margin-bottom: 4px; }
+.dinj { display: block; width: 100%; padding: 4px 7px; margin-bottom: 3px; background: #0a0e16; border: 1px solid #1a2030; color: #3a5070; font-family: var(--fm); font-size: 9px; cursor: pointer; text-align: left; border-radius: 2px; transition: all .1s; }
+.dinj:hover { border-color: #223040; color: #6090b8; }
+.dle { margin-bottom: 1px; font-size: 10px; }
+.dle.p { color: #2a6a2a; } .dle.f { color: #8a2a2a; }
+.dle.w { color: #6a5010; } .dle.i { color: #2a4458; }
+.dle.h { color: #505880; border-top: 1px solid #12181e; margin-top: 4px; padding-top: 3px; }
+#dev-badge {
+  position: fixed; bottom: 4px; right: 8px;
+  background: #140608; border: 1px solid #380c0c; color: #501010;
+  font-family: var(--fm); font-size: 9px; padding: 2px 8px;
+  cursor: pointer; z-index: 9998; letter-spacing: .1em;
+  display: none; border-radius: 2px;
+}
+#dev-badge:hover { color: #803030; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     GAME SCREEN — Step 1 focus
+══════════════════════════════════════════ -->
+<div id="screen-game" class="screen active">
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <div class="tb-brand">IRONBOUND</div>
+    <div class="tb-stat">
+      <div class="tb-stat-label">Turn</div>
+      <div class="tb-stat-value" id="tb-turn">1</div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-label">Day</div>
+      <div class="tb-stat-value" id="tb-day">1</div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-label">Gold</div>
+      <div class="tb-stat-value gold" id="tb-gold">4,200</div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-label">Roster</div>
+      <div class="tb-stat-value" id="tb-roster">3</div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-label">HQ</div>
+      <div class="tb-stat-value" id="tb-hq">—</div>
+    </div>
+    <div class="tb-right">
+      <button class="tb-save-btn" onclick="showToast('Save — not yet implemented.')">SAVE</button>
+      <button id="btn-end-turn" onclick="endTurn()">END TURN ›</button>
+    </div>
+  </div>
+
+  <!-- GAME BODY -->
+  <div id="game-body">
+
+    <!-- MAP CANVAS — full game body, constrained when panel open -->
+    <canvas id="map-canvas"></canvas>
+
+    <!-- DETAILS POPUP — fixed bottom-left, always over map -->
+    <div id="details-popup">
+      <div class="dp-accent-bar" id="dp-bar"></div>
+      <div class="dp-hd">
+        <div class="dp-name" id="dp-name">—</div>
+        <div class="dp-type" id="dp-type">—</div>
+        <div class="dp-close" onclick="closePopup()">✕</div>
+      </div>
+      <div class="dp-body">
+        <div class="dp-row"><span class="dp-label">Size</span><span class="dp-value" id="dp-size">—</span></div>
+        <div class="dp-row" id="dp-zones-row"><span class="dp-label">Zones</span><span class="dp-value" id="dp-zones">—</span></div>
+        <div class="dp-row"><span class="dp-label">Despawn</span><span class="dp-value" id="dp-despawn">—</span></div>
+        <div class="dp-row"><span class="dp-label">Status</span><span class="dp-value" id="dp-status">—</span></div>
+      </div>
+      <div class="dp-ft" id="dp-footer"></div>
+    </div>
+
+    <!-- SIDE PANEL — slides in from right -->
+    <div id="side-panel">
+      <div class="sp-hd">
+        <div class="sp-hd-titles">
+          <div class="sp-hd-name" id="sp-name">—</div>
+          <div class="sp-hd-sub" id="sp-sub">—</div>
+        </div>
+        <div class="sp-close" onclick="closePanel()">✕</div>
+      </div>
+      <!-- City tab strip (hidden when viewing POI) -->
+      <div class="city-tabs" id="city-tabs" style="display:none">
+        <button class="ctab active" data-tab="market"    onclick="cityTab(this)">Market</button>
+        <button class="ctab"        data-tab="tavern"    onclick="cityTab(this)">Tavern</button>
+        <button class="ctab hq-sep" data-tab="roster"    onclick="cityTab(this)">Roster</button>
+        <button class="ctab"        data-tab="storeroom" onclick="cityTab(this)">Storeroom</button>
+        <button class="ctab"        data-tab="ledger"    onclick="cityTab(this)">Ledger</button>
+        <button class="ctab"        data-tab="groups"    onclick="cityTab(this)">Groups</button>
+        <button class="ctab"        data-tab="staff"     onclick="cityTab(this)">Staff</button>
+      </div>
+      <div class="sp-body" id="sp-body"><!-- filled by openPanel() --></div>
+    </div>
+
+  </div><!-- game-body -->
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <span>MAP <span class="sb-val" id="st-map">—</span></span>
+    <span class="sb-dot">·</span>
+    <span>SEED <span class="sb-val" id="st-seed">—</span></span>
+    <span class="sb-dot">·</span>
+    <span>POIs <span class="sb-val" id="st-pois">—</span></span>
+    <span class="sb-hint" id="st-hint">scroll to zoom · drag to pan · click to inspect</span>
+  </div>
+
+</div><!-- screen-game -->
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- DEV -->
+<div id="dev-badge" onclick="DEV.toggle()">DEV ▲</div>
+<div id="dev-panel">
+  <div id="dev-tb">
+    <span class="dtag">⚠ DEV</span>
+    <button class="dbtn ok" onclick="DEV.validate()">✓ Validate</button>
+    <button class="dbtn" onclick="DEV.inj.allDisc()">All discovered</button>
+    <button class="dbtn" onclick="DEV.clear()">✕ Clear</button>
+    <button class="dbtn" style="margin-left:auto" onclick="DEV.toggle()">▼</button>
+  </div>
+  <div id="dev-body">
+    <div id="dev-log"><div class="dle i">· Dev console ready. Open with ?dev in URL.</div></div>
+    <div id="dev-aside">
+      <div class="dasec">Inject</div>
+      <button class="dinj" onclick="DEV.inj.allDisc()">All POIs discovered</button>
+      <button class="dinj" onclick="DEV.inj.noneDisc()">All POIs hidden</button>
+      <button class="dinj" onclick="DEV.inj.rich()">Gold 99,999</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── WORLD GENERATION ────────────────────────────────────────────────────────
+const MAP = 128;
+
+function rng(s) {
+  s = (s ^ 0xdeadbeef) >>> 0;
+  return () => {
+    s = (Math.imul(s ^ (s >>> 16), 0x45d9f3b)) >>> 0;
+    s ^= s >>> 15;
+    return (s >>> 0) / 4294967296;
+  };
+}
+
+// Terrain: seven canonical types per GDD §10
+const TILE_COLORS = {
+  water:     '#00008C',
+  plains:    '#717F5C',
+  forest:    '#004200',
+  mountains: '#747486',
+  snow:      '#BCBECC',
+  desert:    '#B7A33E',
+  wasteland: '#9487A3',
+};
+
+function generateTerrain(seed) {
+  const r = rng(seed);
+  const tiles = [];
+  for (let y = 0; y < MAP; y++) {
+    tiles[y] = [];
+    for (let x = 0; x < MAP; x++) {
+      const v =
+        Math.sin(x * 0.09 + seed * 0.01) * 0.5 +
+        Math.cos(y * 0.07 + seed * 0.013) * 0.4 +
+        Math.sin((x + y) * 0.05) * 0.3 +
+        Math.cos((x - y) * 0.08) * 0.25;
+      const n = (v + 1.45) / 2.9;
+      let t;
+      if      (n < 0.18) t = 'water';
+      else if (n < 0.34) t = 'plains';
+      else if (n < 0.52) t = 'forest';
+      else if (n < 0.68) t = 'mountains';
+      else if (n < 0.78) t = 'snow';
+      else if (n < 0.88) t = 'desert';
+      else               t = 'wasteland';
+      tiles[y][x] = t;
+    }
+  }
+  return tiles;
+}
+
+// Fixed world data
+const SEED = (Date.now() & 0xffff) || 42;
+const tiles = generateTerrain(SEED);
+
+const cities = [
+  { id: 'c0', name: 'Valdenmoor', x: Math.floor(MAP * .18), y: Math.floor(MAP * .18), size: 'large',  hq: true  },
+  { id: 'c1', name: 'Ashford',    x: Math.floor(MAP * .80), y: Math.floor(MAP * .15), size: 'medium', hq: false },
+  { id: 'c2', name: 'Irongate',   x: Math.floor(MAP * .50), y: Math.floor(MAP * .80), size: 'small',  hq: false },
+];
+
+const POI_NAMES = [
+  'Ironveil Hollow','The Pale Crossing','Sundermark','Ashrift Den','Grey Barrow',
+  'Coldfen','Embervault','The Sunken Keep','Duskfall Ridge','Thornmere',
+  'Veilstone','Crumbled Gate','Hollow Pines','Saltmere','Ashen Reach',
+  'Dreadfen','Old Garrison','Carrion Bluff','Mistfall','Wraithwood',
+];
+const POI_TYPES = ['dungeon','ruins','camp','cave','forest zone','stronghold'];
+
+function generatePOIs(seed, count = 20, knownCount = 8) {
+  const r = rng(seed + 1);
+  const pois = [];
+  for (let i = 0; i < count; i++) {
+    let x, y, tries = 0;
+    do {
+      x = Math.floor(r() * (MAP - 16)) + 8;
+      y = Math.floor(r() * (MAP - 16)) + 8;
+      tries++;
+    } while (tiles[y]?.[x] === 'water' && tries < 50);
+    const sz = r() < 0.35 ? 'small' : r() < 0.7 ? 'medium' : 'large';
+    const days = sz === 'small' ? 2 + Math.floor(r() * 8)
+               : sz === 'medium' ? 10 + Math.floor(r() * 50)
+               : 30 + Math.floor(r() * 150);
+    pois.push({
+      id: 'p' + i,
+      name: POI_NAMES[i % POI_NAMES.length],
+      type: POI_TYPES[Math.floor(r() * POI_TYPES.length)],
+      x, y, size: sz,
+      despawnTimer: days * 6,
+      discovered: i < knownCount,
+      zones: 3 + Math.floor(r() * 8),
+    });
+  }
+  return pois;
+}
+
+const pois = generatePOIs(SEED, 20, 8);
+
+// ── TURN STATE ────────────────────────────────────────────────────────────────
+let turn = 1;
+let gold = 4200;
+const hqCity = cities.find(c => c.hq);
+
+function endTurn() {
+  turn++;
+  pois.forEach(p => { p.despawnTimer = Math.max(0, p.despawnTimer - 1); });
+  updateToolbar();
+  draw();
+  if (DEV.IS_DEV) DEV.validate();
+}
+
+function updateToolbar() {
+  document.getElementById('tb-turn').textContent = turn;
+  document.getElementById('tb-day').textContent  = Math.ceil(turn / 6);
+  document.getElementById('tb-gold').textContent = gold.toLocaleString();
+  document.getElementById('tb-hq').textContent   = hqCity ? hqCity.name : '—';
+  const disc = pois.filter(p => p.discovered).length;
+  document.getElementById('st-map').textContent  = MAP + '×' + MAP;
+  document.getElementById('st-seed').textContent = SEED;
+  document.getElementById('st-pois').textContent = disc + '/' + pois.length + ' discovered';
+}
+
+// ── IMAGE SYSTEM (UI §6.9, canonical pattern from map-test) ─────────────────
+const IMG = {};
+
+function loadImg(key, file) {
+  const im = new Image();
+  im.onload  = () => { IMG[key] = im; draw(); };
+  im.onerror = () => { IMG[key] = null; };
+  im.src = './images/' + file;
+}
+
+function getImg(key) { return IMG[key] || null; }
+
+// Load all map images at startup
+loadImg('city',       'map-city-large.png');
+loadImg('poi-sm',     'map-poi-small-disc.png');
+loadImg('poi-md',     'map-poi-medium-disc.png');
+loadImg('poi-lg',     'map-poi-large-disc.png');
+loadImg('poi-undisc', 'map-poi-undisc.png');
+
+// ── CAMERA (UI §6.1) ─────────────────────────────────────────────────────────
+const BASE_TS = 14;
+let cam = { x: 0, y: 0, zoom: 1 };
+function ts() { return BASE_TS * cam.zoom; }
+function w2s(wx, wy) { return [(wx - cam.x) * ts(), (wy - cam.y) * ts()]; }
+function s2w(sx, sy) { return [sx / ts() + cam.x, sy / ts() + cam.y]; }
+
+// Fixed marker sizes (UI §6.6)
+const CITY_R = 38;
+const POI_R  = 18;
+
+// ── CANVAS SETUP ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('map-canvas');
+const ctx    = canvas.getContext('2d');
+const DPR    = devicePixelRatio || 1;
+
+function resizeCanvas() {
+  const gb = document.getElementById('game-body');
+  // Canvas fills game-body; when panel is open it is constrained via CSS right
+  // but we size it to game-body dimensions always
+  canvas.width  = gb.clientWidth  * DPR;
+  canvas.height = gb.clientHeight * DPR;
+  draw();
+}
+
+function initCamera() {
+  const W = canvas.width  / DPR;
+  const H = canvas.height / DPR;
+  // UI §6.1 initial camera — centred on world midpoint
+  cam.x = MAP / 2 - W / (BASE_TS * 2);
+  cam.y = MAP / 2 - H / (BASE_TS * 2);
+  cam.zoom = 1;
+}
+
+// ── DRAW (UI §6.2 layer order) ────────────────────────────────────────────────
+function draw() {
+  const W = canvas.clientWidth  || canvas.width  / DPR;
+  const H = canvas.clientHeight || canvas.height / DPR;
+  const S = ts();
+
+  ctx.save();
+  ctx.scale(DPR, DPR);
+
+  // Layer 1 — background fill
+  ctx.fillStyle = '#04060c';
+  ctx.fillRect(0, 0, W, H);
+
+  // Layer 2 — terrain tiles (UI §6.3)
+  const x0 = Math.max(0,   Math.floor(cam.x));
+  const y0 = Math.max(0,   Math.floor(cam.y));
+  const x1 = Math.min(MAP, Math.ceil(cam.x + W / S) + 1);
+  const y1 = Math.min(MAP, Math.ceil(cam.y + H / S) + 1);
+  for (let ty = y0; ty < y1; ty++) {
+    for (let tx = x0; tx < x1; tx++) {
+      const [sx, sy] = w2s(tx, ty);
+      ctx.fillStyle = TILE_COLORS[tiles[ty][tx]] || '#111';
+      ctx.fillRect(sx, sy, S + 0.5, S + 0.5);
+    }
+  }
+
+  // Layer 3 — grid lines (UI §6.3)
+  if (S > 20) {
+    ctx.strokeStyle = 'rgba(255,255,255,.04)';
+    ctx.lineWidth   = 0.5;
+    for (let tx = x0; tx <= x1; tx++) {
+      const [sx] = w2s(tx, 0);
+      ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, H); ctx.stroke();
+    }
+    for (let ty = y0; ty <= y1; ty++) {
+      const [, sy] = w2s(0, ty);
+      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+    }
+  }
+
+  // Layer 4 — roads (UI §6.4)
+  ctx.save();
+  ctx.setLineDash([S * 0.4, S * 0.28]);
+  ctx.strokeStyle = 'rgba(130,100,40,.3)';
+  ctx.lineWidth   = Math.max(1, S * 0.16);
+  for (let i = 0; i < cities.length; i++) {
+    for (let j = i + 1; j < cities.length; j++) {
+      const [ax, ay] = w2s(cities[i].x + .5, cities[i].y + .5);
+      const [bx, by] = w2s(cities[j].x + .5, cities[j].y + .5);
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Layer 5 — POI markers (UI §6.8)
+  for (const poi of pois) {
+    const [sx, sy] = w2s(poi.x + .5, poi.y + .5);
+    if (sx < -80 || sx > W + 80 || sy < -80 || sy > H + 80) continue;
+    drawPOI(ctx, sx, sy, poi);
+  }
+
+  // Layer 6 — city markers (UI §6.7)
+  for (const city of cities) {
+    const [sx, sy] = w2s(city.x + .5, city.y + .5);
+    if (sx < -120 || sx > W + 120 || sy < -120 || sy > H + 120) continue;
+    drawCity(ctx, sx, sy, city);
+  }
+
+  // Layer 7 — vignette (UI §6.11)
+  const vg = ctx.createRadialGradient(W/2, H/2, H * 0.38, W/2, H/2, H * 0.78);
+  vg.addColorStop(0, 'rgba(4,6,12,0)');
+  vg.addColorStop(1, 'rgba(4,6,12,.6)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.restore();
+}
+
+// ── CITY MARKER (UI §6.7) ─────────────────────────────────────────────────────
+function drawCity(ctx, sx, sy, city) {
+  const cr = CITY_R;
+  const sel = selObj && selObj.id === city.id;
+
+  // 1. HQ glow rings
+  if (city.hq) {
+    ctx.beginPath(); ctx.arc(sx, sy, cr + 14, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(180,130,10,.25)'; ctx.lineWidth = 8; ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx, sy, cr + 22, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(180,130,10,.10)'; ctx.lineWidth = 4; ctx.stroke();
+  }
+
+  // Selected glow
+  if (sel) {
+    ctx.beginPath(); ctx.arc(sx, sy, cr + 6, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(245,192,64,.2)'; ctx.lineWidth = 12; ctx.stroke();
+  }
+
+  // 2. Dark backing disc
+  ctx.beginPath(); ctx.arc(sx, sy, cr + 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(4,6,14,.85)'; ctx.fill();
+
+  // 3. Image clip or fallback
+  const cityImg = getImg('city');
+  ctx.save();
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2); ctx.clip();
+  if (cityImg) {
+    ctx.drawImage(cityImg, sx - cr, sy - cr, cr * 2, cr * 2);
+    ctx.fillStyle = 'rgba(0,0,0,.22)';
+    ctx.fillRect(sx - cr, sy - cr, cr * 2, cr * 2);
+  } else {
+    ctx.fillStyle = '#3a80c0'; ctx.fill();
+  }
+  ctx.restore();
+
+  // 4. Circle border
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2);
+  ctx.strokeStyle = city.hq ? '#c8900e' : (sel ? '#6aaedc' : '#4a70a0');
+  ctx.lineWidth   = city.hq ? 2.5 : (sel ? 2.2 : 1.8);
+  if (sel) { ctx.shadowColor = '#6aaedc'; ctx.shadowBlur = 10; }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // 5. Name label
+  ctx.font = '600 12px Palatino,serif';
+  ctx.fillStyle = '#8ac4e0';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.shadowColor = 'rgba(0,0,0,.98)'; ctx.shadowBlur = 5;
+  ctx.fillText(city.name, sx, sy + cr + 5);
+
+  // 6. [HQ] sub-label
+  if (city.hq) {
+    ctx.font = '300 10px monospace';
+    ctx.fillStyle = '#c89010';
+    ctx.fillText('[HQ]', sx, sy + cr + 19);
+  }
+  ctx.shadowBlur = 0;
+}
+
+// ── POI MARKER (UI §6.8) ──────────────────────────────────────────────────────
+function drawPOI(ctx, sx, sy, poi) {
+  const cr  = POI_R;
+  const sel = selObj && selObj.id === poi.id;
+  const disc = poi.discovered;
+
+  // Image key selection
+  const imgKey = disc
+    ? (poi.size === 'small' ? 'poi-sm' : poi.size === 'large' ? 'poi-lg' : 'poi-md')
+    : 'poi-undisc';
+  const poiImg = getImg(imgKey);
+
+  // Selected glow
+  if (sel) {
+    ctx.beginPath(); ctx.arc(sx, sy, cr + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(245,192,64,.22)'; ctx.lineWidth = 10; ctx.stroke();
+  }
+
+  // 1. Dark backing disc
+  ctx.beginPath(); ctx.arc(sx, sy, cr + 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(4,6,14,.85)'; ctx.fill();
+
+  // 2. Image clip or fallback
+  ctx.save();
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2); ctx.clip();
+  if (poiImg) {
+    ctx.globalAlpha = disc ? 1 : 0.55;
+    ctx.drawImage(poiImg, sx - cr, sy - cr, cr * 2, cr * 2);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = disc ? 'rgba(0,0,0,.2)' : 'rgba(4,6,20,.45)';
+    ctx.fillRect(sx - cr, sy - cr, cr * 2, cr * 2);
+  } else {
+    const fallback = disc
+      ? (poi.size === 'large' ? '#c0900e' : poi.size === 'medium' ? '#a07008' : '#806005')
+      : '#1c2a40';
+    ctx.fillStyle = fallback; ctx.fill();
+  }
+  ctx.restore();
+
+  // 3. Circle border
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2);
+  if (!disc) ctx.setLineDash([4, 3]);
+  ctx.strokeStyle = disc ? (sel ? '#f5c040' : '#c8900e') : '#2a3a60';
+  ctx.lineWidth   = disc ? 2 : 1.5;
+  if (sel && disc) { ctx.shadowColor = '#f5c040'; ctx.shadowBlur = 8; }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.shadowBlur = 0;
+
+  // 4. Name label — discovered only
+  if (disc) {
+    ctx.font = '400 11px Georgia,serif';
+    ctx.fillStyle = 'rgba(200,144,14,.9)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,.98)'; ctx.shadowBlur = 4;
+    ctx.fillText(poi.name, sx, sy + cr + 6);
+    ctx.shadowBlur = 0;
+  }
+}
+
+// ── INTERACTION ───────────────────────────────────────────────────────────────
+let drag   = null;
+let selObj = null;
+
+// mousedown on canvas
+canvas.addEventListener('mousedown', e => {
+  drag = { mx: e.clientX, my: e.clientY, cx: cam.x, cy: cam.y, moved: false };
+  canvas.classList.add('dragging');
+});
+// mousemove and mouseup on WINDOW (UI §6.10)
+window.addEventListener('mousemove', e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.mx, dy = e.clientY - drag.my;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+  if (drag.moved) {
+    const S = ts();
+    cam.x = drag.cx - dx / S;
+    cam.y = drag.cy - dy / S;
+    draw();
+  }
+});
+window.addEventListener('mouseup', () => {
+  if (drag) canvas.classList.remove('dragging');
+  drag = null;
+});
+
+// Scroll wheel zoom with cursor pivot (UI §6.1)
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const S  = ts();
+  const wx = cam.x + mx / S;
+  const wy = cam.y + my / S;
+  cam.zoom = Math.max(0.25, Math.min(20, cam.zoom * (e.deltaY > 0 ? 0.84 : 1.19)));
+  cam.x    = wx - mx / ts();
+  cam.y    = wy - my / ts();
+  draw();
+}, { passive: false });
+
+// Click — hit test against markers
+canvas.addEventListener('click', e => {
+  if (drag && drag.moved) return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  let hit = null;
+
+  // POIs first (smaller, underneath cities in draw order but cities win in overlap)
+  for (const poi of pois) {
+    const [sx, sy] = w2s(poi.x + .5, poi.y + .5);
+    if (Math.hypot(mx - sx, my - sy) < POI_R + 4) {
+      hit = { _type: 'poi', ...poi };
+    }
+  }
+  // Cities override (drawn on top, so checked second to win)
+  for (const city of cities) {
+    const [sx, sy] = w2s(city.x + .5, city.y + .5);
+    if (Math.hypot(mx - sx, my - sy) < CITY_R + 4) {
+      hit = { _type: 'city', ...city };
+    }
+  }
+
+  if (hit) {
+    selObj = hit;
+    showPopup(hit);
+  } else {
+    selObj = null;
+    closePopup();
+  }
+  draw();
+});
+
+// Touch support (UI §6.10)
+let lastTouchDist = null;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    drag = { mx: t.clientX, my: t.clientY, cx: cam.x, cy: cam.y, moved: false };
+  }
+  if (e.touches.length === 2) {
+    lastTouchDist = Math.hypot(
+      e.touches[1].clientX - e.touches[0].clientX,
+      e.touches[1].clientY - e.touches[0].clientY
+    );
+  }
+}, { passive: true });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && drag) {
+    const t = e.touches[0];
+    const S = ts();
+    drag.moved = true;
+    cam.x = drag.cx - (t.clientX - drag.mx) / S;
+    cam.y = drag.cy - (t.clientY - drag.my) / S;
+    draw();
+  }
+  if (e.touches.length === 2 && lastTouchDist !== null) {
+    const dist = Math.hypot(
+      e.touches[1].clientX - e.touches[0].clientX,
+      e.touches[1].clientY - e.touches[0].clientY
+    );
+    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    const S  = ts();
+    const wx = cam.x + cx / S, wy = cam.y + cy / S;
+    cam.zoom = Math.max(0.25, Math.min(20, cam.zoom * (dist / lastTouchDist)));
+    cam.x    = wx - cx / ts();
+    cam.y    = wy - cy / ts();
+    lastTouchDist = dist;
+    draw();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => {
+  drag = null; lastTouchDist = null;
+});
+
+// ── DETAILS POPUP ─────────────────────────────────────────────────────────────
+function showPopup(obj) {
+  const isCity = obj._type === 'city';
+
+  document.getElementById('dp-bar').style.background = isCity ? '#2c6aaa' : '#c8900e';
+  document.getElementById('dp-name').textContent = obj.name;
+  document.getElementById('dp-type').textContent = isCity
+    ? ('city · ' + obj.size + (obj.hq ? ' · headquarters' : ''))
+    : obj.type;
+  document.getElementById('dp-size').textContent = obj.size || '—';
+
+  const zonesRow = document.getElementById('dp-zones-row');
+  zonesRow.style.display = isCity ? 'none' : 'flex';
+  if (!isCity) document.getElementById('dp-zones').textContent = obj.zones;
+
+  const days = isCity ? null : Math.ceil(obj.despawnTimer / 6);
+  const despEl = document.getElementById('dp-despawn');
+  despEl.textContent  = isCity ? 'never' : (days + ' days');
+  despEl.className    = 'dp-value' + (!isCity && days < 6 ? ' warn' : '');
+
+  const disc = isCity || obj.discovered;
+  const stEl = document.getElementById('dp-status');
+  stEl.textContent = disc ? 'Discovered' : 'Undiscovered';
+  stEl.className   = 'dp-value ' + (disc ? 'ok' : 'muted');
+
+  const ft = document.getElementById('dp-footer');
+  if (disc) {
+    ft.innerHTML = `<button class="btn sm primary full" onclick="openPanel('${obj.id}')">▶ Enter ${isCity ? 'city' : 'POI'}</button>`;
+  } else {
+    ft.innerHTML = `<div style="font-size:10px;color:var(--t4);text-align:center;padding:4px 0;letter-spacing:.1em">Discover this location to enter</div>`;
+  }
+
+  document.getElementById('details-popup').style.display = 'block';
+}
+
+function closePopup() {
+  document.getElementById('details-popup').style.display = 'none';
+  selObj = null;
+  draw();
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 2 — PANEL CONTENT
+// ══════════════════════════════════════════════════════
+
+// ── Mock data ─────────────────────────────────────────
+const MOCK_ITEMS_PERM = [
+  { n:'Knife',    t:'One-Handed, Sharp (100%), Melee',    g:[7,10],   s:2, icon:'🗡' },
+  { n:'Rope',     t:'Climbing (70%)',                     g:[5,5],    s:3, icon:'🪢' },
+  { n:'Bandage',  t:'Healing',                            g:[5,10],   s:1, icon:'🩹' },
+  { n:'Bread',    t:'Food (70), Delicious (1)',            g:[8,8],    s:2, icon:'🍞' },
+  { n:'Fruits',   t:'Food (30), Delicious (1)',            g:[2,12],   s:1, icon:'🍎' },
+  { n:'Meat',     t:'Food (80), Delicious (1)',            g:[6,22],   s:2, icon:'🥩' },
+  { n:'Backpack', t:'Equipment (backpack)',                g:[20,30],  s:4, icon:'🎒' },
+  { n:'Bow',      t:'Hunting (100%), Ranged, Two-Handed', g:[25,40],  s:4, icon:'🏹' },
+  { n:'Cloth',    t:'Equipment (garment)',                 g:[10,12],  s:4, icon:'👘' },
+  { n:'Torch',    t:'Lighting (80%)',                     g:[4,4],    s:2, icon:'🔦' },
+  { n:'Lamp',     t:'Lighting (100%)',                    g:[20,20],  s:1, icon:'🪔' },
+];
+const MOCK_ITEMS_ROT = [
+  { n:'Exotic Fruits',  t:'Food (40), Delicious (3)',         g:[10,15],  s:1, icon:'🍇' },
+  { n:'Dried Meat',     t:'Food (100)',                       g:[15,15],  s:1, icon:'🥓' },
+  { n:'Fish',           t:'Food (60), Delicious (1)',          g:[6,8],    s:1, icon:'🐟' },
+  { n:'Sword',          t:'Sharp (40%), Melee, Two-Handed',   g:[40,45],  s:5, icon:'⚔' },
+  { n:'Axe',            t:'Sharp (20%), Melee, One-Handed',   g:[15,17],  s:4, icon:'🪓' },
+  { n:'Leather Armor',  t:'Equipment (garment), Armor 25',    g:[20,30],  s:6, icon:'🥋' },
+  { n:'Chainmail',      t:'Equipment (garment), Armor 35',    g:[80,80],  s:8, icon:'⛓' },
+  { n:'Pickaxe',        t:'Mining (100%), Two-Handed, Melee', g:[30,30],  s:6, icon:'⛏' },
+  { n:'Metal Helmet',   t:'Equipment (head), Armor 30',       g:[50,50],  s:3, icon:'⛑' },
+  { n:'Fish Net',       t:'Fishing (100%)',                   g:[20,20],  s:3, icon:'🕸' },
+];
+const MOCK_ITEMS_RARE = [
+  { n:'Plate Armor',    t:'Equipment (garment), Armor 50',  g:[300,300], s:9, icon:'🛡' },
+  { n:'Large Backpack', t:'Equipment (backpack)',            g:[40,45],   s:5, icon:'🎒' },
+  { n:'Leather Cloak',  t:'Equipment (head), Armor 20',     g:[10,20],   s:3, icon:'🧥' },
+];
+const MOCK_RECRUITS = [
+  { id:'r0', name:'Aldric Moss',   level:6, race:'human', traits:['Strong','Watchful'], cost:120 },
+  { id:'r1', name:'Seren Vale',    level:5, race:'human', traits:['Fast'],              cost:90  },
+  { id:'r2', name:'Durn Ashwood',  level:7, race:'human', traits:['Resilient','Greedy'],cost:160 },
+  { id:'r3', name:'Lira Coldfen',  level:5, race:'human', traits:['Dexterous'],         cost:95  },
+  { id:'r4', name:'Bram Ironstep', level:6, race:'human', traits:['Loyal','Slow'],      cost:110 },
+];
+const MOCK_ROSTER = [
+  { name:'Aldric Moss',   level:6, race:'human', state:'Available', loc:'Valdenmoor HQ',   loyalty:22 },
+  { name:'Seren Vale',    level:5, race:'human', state:'Deployed',  loc:'Ironveil Hollow', loyalty:15 },
+  { name:'Durn Ashwood',  level:7, race:'human', state:'Wounded',   loc:'Ashrift Den',     loyalty:8  },
+];
+const MOCK_INV = [
+  { n:'Bread',                  qty:6, g:[8,8],     s:2, icon:'🍞' },
+  { n:'Iron Ore',               qty:4, g:[8,12],    s:2, icon:'🪨' },
+  { n:'Hunting Trophy (small)', qty:2, g:[10,15],   s:1, icon:'🏆' },
+  { n:'Bandage',                qty:3, g:[5,10],    s:1, icon:'🩹' },
+  { n:'Unidentified Artifact',  qty:1, g:[150,300], s:1, icon:'🔮' },
+];
+const MOCK_LEDGER = [
+  { turn:5, desc:'Upkeep — 3 recruits',   amt:-540, bal:3660 },
+  { turn:4, desc:'Sold: Iron Ore ×3',     amt:32,   bal:4200 },
+  { turn:3, desc:'Purchased: Bandage ×5', amt:-40,  bal:4168 },
+  { turn:1, desc:'Starting balance',      amt:4200, bal:4200 },
+];
+const MOCK_GROUPS = [
+  { name:'Vanguard',  role:'Scout',  members:['Aldric','Seren'], loc:'Ironveil Hollow',  task:'Gather valuables',  sched:[0,0,0,0,0,1] },
+  { name:'Ironwatch', role:'Combat', members:['Durn'],           loc:'Travelling',       task:'Returning to HQ',   sched:[0,0,0,0,0,1] },
+];
+const MOCK_ZONES = [
+  { id:'z0', n:'Entry Hall',         s:'Scouted',  x:120, y:170 },
+  { id:'z1', n:'Collapsed Passage',  s:'Unknown',  x:215, y:110 },
+  { id:'z2', n:'Flooded Chamber',    s:'Scouted',  x:215, y:228 },
+  { id:'z3', n:'Deep Vault',         s:'Unknown',  x:310, y:76  },
+  { id:'z4', n:'Guard Room',         s:'Unknown',  x:310, y:188 },
+  { id:'z5', n:'The Pit',            s:'Unknown',  x:395, y:132 },
+];
+const MOCK_EDGES = [['z0','z1'],['z0','z2'],['z1','z3'],['z1','z4'],['z2','z4'],['z4','z5']];
+
+// Purchase basket state
+let basket = [];
+
+// ── PANEL ROUTING ─────────────────────────────────────
+function openPanel(id) {
+  const city = cities.find(c => c.id === id);
+  const poi  = pois.find(p => p.id === id);
+  const obj  = city || poi;
+  if (!obj) return;
+
+  const isCity = !!city;
+  document.getElementById('sp-name').textContent = obj.name;
+  document.getElementById('sp-sub').textContent  = isCity
+    ? (obj.size.toUpperCase() + ' CITY' + (obj.hq ? ' · HEADQUARTERS' : ''))
+    : (obj.type.toUpperCase() + ' · ' + obj.size.toUpperCase());
+
+  const tabs = document.getElementById('city-tabs');
+  tabs.style.display = isCity ? 'flex' : 'none';
+
+  if (isCity) {
+    // Reset to Market tab
+    document.querySelectorAll('.ctab').forEach((t,i) => t.classList.toggle('active', i === 0));
+    renderCityPanel('market');
+  } else {
+    renderPOIPanel(obj);
+  }
+
+  document.getElementById('side-panel').classList.add('open');
+  canvas.classList.add('panel-open');
+  resizeCanvas();
+  document.getElementById('st-hint').textContent = 'Viewing: ' + obj.name;
+}
+
+function closePanel() {
+  document.getElementById('side-panel').classList.remove('open');
+  canvas.classList.remove('panel-open');
+  resizeCanvas();
+  document.getElementById('st-hint').textContent = 'scroll to zoom · drag to pan · click to inspect';
+}
+
+// ── CITY TABS ─────────────────────────────────────────
+function cityTab(btn) {
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderCityPanel(btn.dataset.tab);
+}
+
+function renderCityPanel(tab) {
+  const body = document.getElementById('sp-body');
+  const fns = { market: renderMarket, tavern: renderTavern, roster: renderRoster,
+                storeroom: renderStoreroom, ledger: renderLedger,
+                groups: renderGroups, staff: renderStaff };
+  body.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'tab-pane active';
+  body.appendChild(wrap);
+  (fns[tab] || (() => { wrap.innerHTML='<p style="color:var(--t4);padding:20px">Not implemented</p>'; }))(wrap);
+}
+
+// ── MARKET ────────────────────────────────────────────
+let mktCat = 'perm';
+
+function renderMarket(wrap) {
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Stock Category</div>
+      <div class="mkt-cats">
+        <button class="mkt-cat ${mktCat==='perm'?'active':''}"  onclick="switchMkt('perm',this)">Permanent</button>
+        <button class="mkt-cat ${mktCat==='rot'?'active':''}"   onclick="switchMkt('rot',this)">Rotating</button>
+        <button class="mkt-cat ${mktCat==='rare'?'active':''}"  onclick="switchMkt('rare',this)">Rare</button>
+      </div>
+      <div id="mkt-list"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">For Purchase <span class="sec-action" onclick="clearBasket()">Clear all</span></div>
+      <div class="purchase-box">
+        <div class="purchase-staged" id="pur-staged"></div>
+        <div class="purchase-totals"><span style="color:var(--t4)">Price range</span><span class="pt-val" id="pur-total">0 – 0 gold</span></div>
+        <div class="purchase-tax" id="pur-tax">Tax (10%): max 0 gold</div>
+        <button class="btn primary full sm" onclick="confirmPurchase()">▶ Buy</button>
+      </div>
+    </div>`;
+  renderMktItems();
+  renderBasket();
+}
+
+function switchMkt(cat, btn) {
+  mktCat = cat;
+  document.querySelectorAll('.mkt-cat').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMktItems();
+}
+
+function renderMktItems() {
+  const items = mktCat === 'perm' ? MOCK_ITEMS_PERM : mktCat === 'rot' ? MOCK_ITEMS_ROT : MOCK_ITEMS_RARE;
+  const el = document.getElementById('mkt-list');
+  if (!el) return;
+  el.innerHTML = items.map((it, i) => `
+    <div class="item-row" onclick="addToBasket(${i},'${mktCat}')">
+      <div class="item-icon">${it.icon}</div>
+      <div class="item-info">
+        <div class="item-name">${it.n}</div>
+        <div class="item-tags">${it.t}</div>
+      </div>
+      <div class="item-gold">◈ ${it.g[0]}–${it.g[1]}</div>
+      <div class="item-size">sz ${it.s}</div>
+    </div>`).join('');
+}
+
+function addToBasket(idx, cat) {
+  const items = cat === 'perm' ? MOCK_ITEMS_PERM : cat === 'rot' ? MOCK_ITEMS_ROT : MOCK_ITEMS_RARE;
+  basket.push({ ...items[idx], _cat: cat, _idx: idx });
+  renderBasket();
+}
+function removeFromBasket(i) { basket.splice(i, 1); renderBasket(); }
+function clearBasket() { basket = []; renderBasket(); }
+
+function renderBasket() {
+  const el = document.getElementById('pur-staged');
+  const tot = document.getElementById('pur-total');
+  const tax = document.getElementById('pur-tax');
+  if (!el) return;
+  if (!basket.length) {
+    el.innerHTML = '<div class="purchase-empty">Stage items above to purchase them.</div>';
+    if (tot) tot.textContent = '0 – 0 gold';
+    if (tax) tax.textContent = 'Tax (10%): max 0 gold';
+    return;
+  }
+  el.innerHTML = basket.map((it, i) => `
+    <div class="purchase-staged-row">
+      <span class="psr-name">${it.n}</span>
+      <span class="psr-gold">◈ ${it.g[0]}–${it.g[1]}</span>
+      <span class="psr-rm" onclick="removeFromBasket(${i})">✕</span>
+    </div>`).join('');
+  const mn = basket.reduce((s, i) => s + i.g[0], 0);
+  const mx = basket.reduce((s, i) => s + i.g[1], 0);
+  if (tot) tot.textContent = `${mn} – ${mx} gold`;
+  if (tax) tax.textContent = `Tax (10%): max ${Math.ceil(mx * 1.1)} gold`;
+}
+
+function confirmPurchase() {
+  if (!basket.length) return;
+  showToast('Purchase confirmed (UI prototype — no gold deducted).');
+  clearBasket();
+}
+
+// ── TAVERN ────────────────────────────────────────────
+function renderTavern(wrap) {
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Available Recruits <span style="color:var(--t4);font-weight:400">— refreshes weekly</span></div>
+      <div class="recruit-list">
+        ${MOCK_RECRUITS.map(r => `
+          <div class="recruit-card" onclick="showToast('Hire ${r.name} — not yet implemented.')">
+            <div class="recruit-portrait"><span>◈</span></div>
+            <div class="recruit-body">
+              <div class="recruit-name">${r.name}</div>
+              <div class="recruit-level">Level ${r.level} · ${r.race}</div>
+              <div class="recruit-traits">${r.traits.map(t => `<span class="trait">${t}</span>`).join('')}</div>
+              <div class="recruit-cost">◈ ${r.cost} gold</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── ROSTER ────────────────────────────────────────────
+function renderRoster(wrap) {
+  const badgeClass = { Available:'badge-ok', Deployed:'badge-blue', Wounded:'badge-warn', Incapacitated:'badge-bad' };
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Guild Roster</div>
+      <table class="data-table">
+        <thead><tr>
+          <th>Name</th><th>Lvl</th><th>State</th><th>Location</th><th>Loyalty</th>
+        </tr></thead>
+        <tbody>
+          ${MOCK_ROSTER.map(r => `
+            <tr onclick="showToast('${r.name} — character detail not yet implemented.')">
+              <td style="font-family:var(--fb);color:var(--t1)">${r.name}</td>
+              <td>${r.level}</td>
+              <td><span class="badge ${badgeClass[r.state]||'badge-ok'}">${r.state}</span></td>
+              <td style="font-size:10px;color:var(--t3)">${r.loc}</td>
+              <td>
+                <span style="color:${r.loyalty>15?'var(--okb)':r.loyalty>7?'var(--warnb)':'var(--badb)'}">${r.loyalty}</span>
+                <span class="loyalty-bar"><span class="loyalty-fill" style="width:${Math.round(r.loyalty/30*100)}%"></span></span>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── STOREROOM ─────────────────────────────────────────
+let forSale = [];
+
+function renderStoreroom(wrap) {
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Inventory</div>
+      <div id="inv-list">
+        ${MOCK_INV.map(it => `
+          <div class="item-row" onclick="moveToSale('${it.n}',${JSON.stringify(it.g)})">
+            <div class="item-icon">${it.icon}</div>
+            <div class="item-info">
+              <div class="item-name">${it.n} ×${it.qty}</div>
+              <div class="item-tags">◈ ${it.g[0]}–${it.g[1]} gold · size ${it.s}</div>
+            </div>
+            <div style="font-size:9px;color:var(--g1);cursor:pointer">→ Sale</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">For Sale</div>
+      <div style="background:var(--s1);border:1px solid var(--b1);padding:12px;border-radius:var(--r)">
+        <div id="for-sale-list"><div class="purchase-empty">No items staged.</div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:8px;margin-bottom:10px">
+          <span style="color:var(--t4)">Estimated value</span>
+          <span style="color:var(--g2)" id="sale-total">0 – 0 gold</span>
+        </div>
+        <button class="btn primary full sm" onclick="confirmSale()">▶ Sell All</button>
+      </div>
+    </div>`;
+}
+
+function moveToSale(name, g) {
+  forSale.push({ name, g });
+  const el = document.getElementById('for-sale-list');
+  const tot = document.getElementById('sale-total');
+  if (el) {
+    el.innerHTML = forSale.map((it, i) => `
+      <div class="purchase-staged-row">
+        <span class="psr-name">${it.name}</span>
+        <span class="psr-gold">◈ ${it.g[0]}–${it.g[1]}</span>
+        <span class="psr-rm" onclick="removeFromSale(${i})">✕</span>
+      </div>`).join('');
+  }
+  const mn = forSale.reduce((s,i)=>s+i.g[0],0), mx=forSale.reduce((s,i)=>s+i.g[1],0);
+  if (tot) tot.textContent = `${mn} – ${mx} gold`;
+}
+
+function removeFromSale(i) {
+  forSale.splice(i, 1);
+  const el = document.getElementById('for-sale-list');
+  const tot = document.getElementById('sale-total');
+  if (el) {
+    if (!forSale.length) { el.innerHTML = '<div class="purchase-empty">No items staged.</div>'; }
+    else el.innerHTML = forSale.map((it,j) => `
+      <div class="purchase-staged-row">
+        <span class="psr-name">${it.name}</span>
+        <span class="psr-gold">◈ ${it.g[0]}–${it.g[1]}</span>
+        <span class="psr-rm" onclick="removeFromSale(${j})">✕</span>
+      </div>`).join('');
+    const mn = forSale.reduce((s,i)=>s+i.g[0],0), mx=forSale.reduce((s,i)=>s+i.g[1],0);
+    if (tot) tot.textContent = `${mn} – ${mx} gold`;
+  }
+}
+
+function confirmSale() {
+  if (!forSale.length) return;
+  showToast('Sale confirmed (UI prototype — no gold added).');
+  forSale = [];
+  const el = document.getElementById('for-sale-list');
+  const tot = document.getElementById('sale-total');
+  if (el) el.innerHTML = '<div class="purchase-empty">No items staged.</div>';
+  if (tot) tot.textContent = '0 – 0 gold';
+}
+
+// ── LEDGER ────────────────────────────────────────────
+function renderLedger(wrap) {
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Transactions</div>
+      <table class="data-table">
+        <thead><tr><th>Turn</th><th>Description</th><th>Amount</th><th>Balance</th></tr></thead>
+        <tbody>
+          ${MOCK_LEDGER.map(row => `
+            <tr>
+              <td style="color:var(--t4)">T${row.turn}</td>
+              <td style="font-family:var(--fb)">${row.desc}</td>
+              <td style="color:${row.amt>0?'var(--okb)':'var(--badb)'}">${row.amt>0?'+':''}${row.amt}</td>
+              <td style="color:var(--g2)">◈ ${row.bal}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── GROUP MANAGER ─────────────────────────────────────
+function renderGroups(wrap) {
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Active Groups <span class="sec-action" onclick="showToast('Group creation — not yet implemented.')">+ New Group</span></div>
+      ${MOCK_GROUPS.map(g => `
+        <div class="group-card">
+          <div class="group-card-hd">
+            <div>
+              <div class="group-card-name">${g.name}</div>
+              <div class="group-card-role">${g.role}</div>
+            </div>
+            <div class="group-card-loc">${g.loc}</div>
+          </div>
+          <div class="group-card-body">
+            <div class="group-members">
+              ${g.members.map(m => `<div class="member-token"><span>${m[0]}</span></div>`).join('')}
+              ${Array(9 - g.members.length).fill(0).map(() => '<div class="member-token empty"></div>').join('')}
+            </div>
+            <div class="group-task-lbl">Current task</div>
+            <div class="group-task">${g.task}</div>
+          </div>
+          <div class="group-card-ft">
+            <button class="btn-xs" onclick="showToast('Group detail — not yet implemented.')">Details</button>
+            <button class="btn-xs" onclick="showToast('Schedule — not yet implemented.')">Schedule</button>
+            <button class="btn-xs" onclick="showToast('Task list — not yet implemented.')">Tasks</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── STAFF ASSIGNMENTS ─────────────────────────────────
+function renderStaff(wrap) {
+  const tasks = [
+    { name:'Gather Rumors',              desc:'Determines how many newly spawned POIs are Discovered. No additional effect beyond the public baseline in v1.' },
+    { name:'Develop Trading Connections',desc:'Increases Market variety and raises chance of rare drops in the weekly rotation.' },
+    { name:'Train Recruits',             desc:'Slowly improves unassigned recruits over time.' },
+    { name:'Treat Wounded',              desc:'Reduces recovery time for injured recruits at headquarters.' },
+  ];
+  wrap.innerHTML = `
+    <div class="sec">
+      <div class="sec-title">Headquarters Staff</div>
+      ${tasks.map(task => `
+        <div class="staff-card">
+          <div class="staff-name">${task.name}</div>
+          <div class="staff-desc">${task.desc}</div>
+          <div class="staff-slots">
+            <div class="staff-slot filled"><span>◈</span></div>
+            ${Array(3).fill(0).map(() => '<div class="staff-slot" onclick="showToast('Staff assignment — not yet implemented.')"></div>').join('')}
+          </div>
+          <button class="btn-xs" onclick="showToast('Staff assignment — not yet implemented.')">Assign Recruit</button>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── POI PANEL ─────────────────────────────────────────
+function renderPOIPanel(poi) {
+  const body = document.getElementById('sp-body');
+  const days = Math.ceil(poi.despawnTimer / 6);
+  body.innerHTML = `
+    <div style="padding:16px 18px;border-bottom:1px solid var(--b1)">
+      <div class="sec-title">Overview</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+        <div class="dp-row"><span class="dp-label">Type</span><span class="dp-value">${poi.type}</span></div>
+        <div class="dp-row"><span class="dp-label">Size</span><span class="dp-value">${poi.size}</span></div>
+        <div class="dp-row"><span class="dp-label">Zones</span><span class="dp-value">${poi.zones}</span></div>
+        <div class="dp-row"><span class="dp-label">Despawn</span><span class="dp-value ${days<6?'warn':''}">${days} days</span></div>
+      </div>
+      <p style="font-family:var(--fb);font-size:13px;color:var(--t3);font-style:italic;line-height:1.6">
+        A ${poi.size} ${poi.type}.
+        ${days < 10 ? 'It will not last much longer — act quickly.' : 'There is still time to plan before it disappears.'}
+      </p>
+    </div>
+    <div style="padding:14px 18px 6px;border-bottom:1px solid var(--b1)">
+      <div class="sec-title">Zone layout — click a zone to inspect</div>
+    </div>
+    <div id="zone-graph-wrap"><canvas id="zone-canvas"></canvas></div>
+    <div class="zone-detail" id="zone-detail">
+      <p style="font-size:11px;color:var(--t4);font-style:italic;text-align:center;padding:12px 0">Click a zone above to inspect it.</p>
+    </div>`;
+  setTimeout(drawZoneGraph, 50);
+}
+
+// ── ZONE GRAPH CANVAS ─────────────────────────────────
+function drawZoneGraph() {
+  const wrap   = document.getElementById('zone-graph-wrap');
+  const canvas = document.getElementById('zone-canvas');
+  if (!wrap || !canvas) return;
+  const dpr = devicePixelRatio;
+  canvas.width  = wrap.clientWidth  * dpr;
+  canvas.height = wrap.clientHeight * dpr;
+  canvas.style.width  = wrap.clientWidth  + 'px';
+  canvas.style.height = wrap.clientHeight + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.save(); ctx.scale(dpr, dpr);
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+
+  ctx.fillStyle = '#03050a'; ctx.fillRect(0, 0, W, H);
+
+  // Edges
+  MOCK_EDGES.forEach(([a, b]) => {
+    const za = MOCK_ZONES.find(z => z.id === a);
+    const zb = MOCK_ZONES.find(z => z.id === b);
+    if (!za || !zb) return;
+    ctx.beginPath(); ctx.moveTo(za.x, za.y); ctx.lineTo(zb.x, zb.y);
+    ctx.strokeStyle = '#1a2535'; ctx.lineWidth = 2; ctx.stroke();
+  });
+
+  // Zone nodes
+  MOCK_ZONES.forEach(z => {
+    const r = 26, sc = z.s === 'Scouted';
+    // Try zone background image first
+    const zoneImg = getImg('zone-' + z.n.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
+    ctx.save();
+    ctx.beginPath(); ctx.arc(z.x, z.y, r, 0, Math.PI * 2); ctx.clip();
+    if (zoneImg && sc) {
+      ctx.drawImage(zoneImg, z.x - r, z.y - r, r * 2, r * 2);
+      ctx.fillStyle = 'rgba(4,6,12,.45)'; ctx.fillRect(z.x - r, z.y - r, r * 2, r * 2);
+    } else {
+      ctx.fillStyle = sc ? '#0e1828' : '#060912';
+      ctx.fillRect(z.x - r, z.y - r, r * 2, r * 2);
+    }
+    ctx.restore();
+
+    // Border
+    ctx.beginPath(); ctx.arc(z.x, z.y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = sc ? '#2c4a80' : '#1a2535'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // Label
+    ctx.font = sc ? `400 10px 'Lora',serif` : `300 10px 'DM Mono',monospace`;
+    ctx.fillStyle = sc ? '#c0ccde' : '#2e3a50';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,.8)'; ctx.shadowBlur = sc ? 3 : 0;
+    ctx.fillText(sc ? z.n : '?', z.x, z.y); ctx.shadowBlur = 0;
+  });
+
+  ctx.restore();
+
+  // Click detection on zone nodes
+  canvas.onclick = e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const hit = MOCK_ZONES.find(z => Math.hypot(mx - z.x, my - z.y) < 28);
+    if (hit) renderZoneDetail(hit);
+  };
+}
+
+// ── ZONE DETAIL ───────────────────────────────────────
+function renderZoneDetail(zone) {
+  const el = document.getElementById('zone-detail');
+  if (!el) return;
+  const sc = zone.s === 'Scouted';
+
+  if (!sc) {
+    el.innerHTML = `
+      <div class="sec" style="margin-top:14px">
+        <div class="sec-title">${zone.n}</div>
+        <p style="font-family:var(--fb);font-size:13px;color:var(--t3);font-style:italic;line-height:1.6">
+          This zone has not been explored. Send a group here to scout it and reveal what it contains.
+        </p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="sec" style="margin-top:14px">
+      <div class="sec-title">${zone.n} — Conditions</div>
+      <div class="zone-cond-row">
+        <span class="zcr-label">Light level</span>
+        <div class="prog"><div class="prog-fill pf-gold" style="width:70%"></div></div>
+        <span class="zcr-val">70%</span>
+      </div>
+      <div class="zone-cond-row">
+        <span class="zcr-label">Weather</span>
+        <span style="font-size:10px;color:var(--t4)">No adverse conditions</span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Located Objects</div>
+      <div class="obj-row">
+        <div class="obj-icon-wrap">◼</div>
+        <span class="obj-name">Stone Formation</span>
+        <span class="obj-meta">size 2</span>
+      </div>
+      <div class="obj-row">
+        <div class="obj-icon-wrap">◼</div>
+        <span class="obj-name">Iron Ore Deposit</span>
+        <span class="obj-meta">size 3 · gatherable</span>
+      </div>
+      <div class="obj-row">
+        <div class="obj-icon-wrap living"><span>◈</span></div>
+        <span class="obj-name">Seren Vale</span>
+        <span class="obj-meta">your recruit</span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Known Objects</div>
+      <div class="obj-row" style="opacity:.5">
+        <div class="obj-icon-wrap" style="font-family:var(--fm);font-size:9px">?</div>
+        <span class="obj-name" style="color:var(--t3);font-style:italic">Unidentified structure</span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Actions — Seren Vale</div>
+      <div class="act-row"><span class="act-name">Scout Zone</span><span class="act-cost">5 AP per attempt</span></div>
+      <div class="act-row"><span class="act-name">Rest</span><span class="act-cost">46 AP · full turn</span></div>
+      <div class="act-row"><span class="act-name">Eat</span><span class="act-cost">5 AP</span></div>
+      <div class="act-row"><span class="act-name">Hide</span><span class="act-cost">5 AP per attempt</span></div>
+      <div class="act-row"><span class="act-name">Move to adjacent zone</span><span class="act-cost">→</span></div>
+    </div>`;
+
+  el.querySelectorAll('.act-row').forEach(row => {
+    row.addEventListener('click', () => {
+      showToast('"' + row.querySelector('.act-name').textContent + '" — action system not yet implemented.');
+    });
+  });
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(m, d = 2750) {
+  const el = document.getElementById('toast');
+  el.textContent = m;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), d);
+}
+
+// ── DEV SYSTEM ────────────────────────────────────────────────────────────────
+const DEV = (() => {
+  const IS_DEV = location.search.includes('dev');
+  let pc = 0, fc = 0;
+
+  function init() {
+    if (!IS_DEV) return;
+    document.getElementById('dev-badge').style.display = 'block';
+  }
+
+  function log(m, lv = 'i') {
+    const el = document.getElementById('dev-log');
+    if (!el) return;
+    const d = document.createElement('div');
+    d.className = 'dle ' + lv;
+    d.textContent = { p:'✓', f:'✗', w:'⚠', i:'·', h:'▸' }[lv] + ' ' + m;
+    el.appendChild(d); el.scrollTop = el.scrollHeight;
+    if (lv === 'p') pc++; if (lv === 'f') fc++;
+  }
+
+  function clear() {
+    const el = document.getElementById('dev-log');
+    if (el) el.innerHTML = ''; pc = 0; fc = 0;
+  }
+
+  function toggle() {
+    const p = document.getElementById('dev-panel');
+    const b = document.getElementById('dev-badge');
+    p.classList.toggle('open');
+    b.textContent = p.classList.contains('open') ? 'DEV ▼' : 'DEV ▲';
+  }
+
+  const RULES = [
+    { id:'MAP-001', desc:'Tile grid is MAP×MAP',
+      check: () => tiles.length === MAP && tiles[0].length === MAP || 'Grid mismatch' },
+    { id:'MAP-002', desc:'All tile types are valid',
+      check: () => {
+        const valid = new Set(Object.keys(TILE_COLORS));
+        for (const row of tiles) for (const t of row) if (!valid.has(t)) return 'Invalid tile: ' + t;
+        return true;
+      }},
+    { id:'MAP-003', desc:'Exactly 3 cities',
+      check: () => cities.length === 3 || 'Got ' + cities.length },
+    { id:'MAP-004', desc:'Exactly one HQ city',
+      check: () => { const n = cities.filter(c => c.hq).length; return n === 1 || 'HQ count=' + n; }},
+    { id:'MAP-005', desc:'All cities within map bounds',
+      check: () => { const bad = cities.filter(c => c.x < 0 || c.y < 0 || c.x >= MAP || c.y >= MAP); return bad.length === 0 || bad.map(c=>c.name).join(', ') + ' out of bounds'; }},
+    { id:'MAP-006', desc:'All POIs within map bounds',
+      check: () => { const bad = pois.filter(p => p.x < 0 || p.y < 0 || p.x >= MAP || p.y >= MAP); return bad.length === 0 || bad.length + ' POIs out of bounds'; }},
+    { id:'MAP-007', desc:'No POI despawnTimer < 0',
+      check: () => { const bad = pois.filter(p => p.despawnTimer < 0); return bad.length === 0 || bad.length + ' negative'; }},
+    { id:'MAP-008', desc:'POI zone counts 3–20',
+      check: () => { const bad = pois.filter(p => p.zones < 3 || p.zones > 20); return bad.length === 0 || bad.length + ' out of range'; }},
+    { id:'IMG-001', desc:'IMG registry keys are all strings',
+      check: () => { const bad = Object.keys(IMG).filter(k => typeof k !== 'string'); return bad.length === 0 || bad.join(', '); }},
+    { id:'CAM-001', desc:'Camera zoom within 0.25–20',
+      check: () => (cam.zoom >= 0.25 && cam.zoom <= 20) || 'zoom=' + cam.zoom },
+    { id:'CAM-002', desc:'CITY_R=38, POI_R=18',
+      check: () => (CITY_R === 38 && POI_R === 18) || `CITY_R=${CITY_R} POI_R=${POI_R}` },
+    { id:'CAM-003', desc:'BASE_TS=14',
+      check: () => BASE_TS === 14 || 'BASE_TS=' + BASE_TS },
+  ];
+
+  function validate() {
+    clear();
+    log('Validation — turn ' + turn, 'h');
+    pc = 0; fc = 0;
+    RULES.forEach(rule => {
+      let r;
+      try { r = rule.check(); } catch(e) { r = 'ERROR: ' + e.message; }
+      log('[' + rule.id + '] ' + rule.desc, r === true ? 'p' : 'f');
+      if (r !== true) log('  ' + r, 'w');
+    });
+    log('─ ' + pc + ' passed · ' + fc + ' failed ─', 'h');
+    if (!document.getElementById('dev-panel').classList.contains('open')) toggle();
+
+    // Image report
+    const loaded  = Object.keys(IMG).filter(k => IMG[k] !== null);
+    const missing = Object.keys(IMG).filter(k => IMG[k] === null);
+    log('Images: ' + loaded.length + ' loaded, ' + missing.length + ' missing', 'i');
+    if (missing.length) missing.forEach(k => log('  missing: ' + k, 'w'));
+  }
+
+  const inj = {
+    allDisc:  () => { pois.forEach(p => p.discovered = true);  draw(); log('All POIs discovered', 'i'); },
+    noneDisc: () => { pois.forEach(p => p.discovered = false); draw(); log('All POIs hidden', 'i'); },
+    rich:     () => { gold = 99999; updateToolbar(); log('gold=99999', 'i'); },
+  };
+
+  document.addEventListener('DOMContentLoaded', init);
+  return { validate, clear, toggle, log, inj, IS_DEV, RULES };
+})();
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => { resizeCanvas(); });
+
+// Size canvas to game body, init camera, draw
+resizeCanvas();
+initCamera();
+updateToolbar();
+draw();
+</script>
+</body>
+</html>

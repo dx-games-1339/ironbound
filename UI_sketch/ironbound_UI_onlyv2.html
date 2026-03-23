@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ironbound</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Share+Tech+Mono&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   DESIGN SYSTEM
+   Dark medieval — iron, parchment, candlelight
+═══════════════════════════════════════════════════ */
+:root {
+  /* Surfaces */
+  --s0: #05070d;          /* void — map bg */
+  --s1: #090c15;          /* deepest panel */
+  --s2: #0d1120;          /* panel */
+  --s3: #111628;          /* panel raised */
+  --s4: #161c30;          /* interactive surface */
+  --s5: #1d2438;          /* hover surface */
+
+  /* Borders */
+  --b1: #1a2035;
+  --b2: #242e48;
+  --b3: #2f3d60;
+  --b4: #3d5080;          /* highlight border */
+
+  /* Text */
+  --t1: #e8eef8;          /* primary — important values */
+  --t2: #9daabf;          /* secondary — labels */
+  --t3: #54647a;          /* tertiary — hints */
+  --t4: #2e3a4e;          /* muted — disabled */
+
+  /* Accent — gold / candlelight */
+  --a1: #d4980e;          /* gold primary */
+  --a2: #f0b820;          /* gold bright */
+  --a3: #8a5e06;          /* gold dark */
+  --a4: rgba(212,152,14,.08); /* gold glow bg */
+
+  /* Status */
+  --ok:  #3a9e52;
+  --okb: #52c870;
+  --warn:#b87a14;
+  --warnb:#e8a030;
+  --bad: #9e2828;
+  --badb:#d04040;
+  --blue:#2e6eb0;
+  --blueb:#4a92d8;
+
+  /* Typography */
+  --fd: 'Cinzel', 'Palatino Linotype', serif;
+  --fb: 'Crimson Pro', Georgia, serif;
+  --fm: 'Share Tech Mono', 'Courier New', monospace;
+
+  /* Layout */
+  --toolbar-h: 52px;
+  --statusbar-h: 24px;
+  --panel-w: 420px;       /* side panel width */
+  --panel-map-gap: 0px;
+  --anim: .22s;
+  --anim-fast: .12s;
+  --r: 3px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  background: var(--s0);
+  color: var(--t2);
+  font-family: var(--fm);
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════════════ */
+.screen { position:absolute; inset:0; display:none; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* ═══════════════════════════════════════════════════
+   LAUNCH SCREEN
+═══════════════════════════════════════════════════ */
+#screen-launch {
+  align-items:center; justify-content:center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(12,24,8,.9) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 0%,   rgba(8,12,28,.8) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, #05080f 0%, #03050a 100%);
+}
+.launch-noise {
+  position:absolute; inset:0; opacity:.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+.launch-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(var(--b1) 1px, transparent 1px),
+    linear-gradient(90deg, var(--b1) 1px, transparent 1px);
+  background-size:64px 64px;
+  opacity:.18;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%);
+}
+.launch-inner {
+  position:relative; text-align:center;
+  animation: reveal .7s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes reveal {
+  from { opacity:0; transform:translateY(20px); filter:blur(4px); }
+  to   { opacity:1; transform:none; filter:none; }
+}
+.launch-emblem {
+  width:60px; height:60px; margin:0 auto 24px;
+  border:1px solid var(--a3);
+  transform:rotate(45deg);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 30px rgba(180,120,10,.12), inset 0 0 20px rgba(180,120,10,.06);
+}
+.launch-emblem span { transform:rotate(-45deg); font-size:22px; color:var(--a1); }
+.launch-title {
+  font-family: var(--fd); font-size:72px; font-weight:700;
+  color:var(--a2); letter-spacing:.2em; line-height:1;
+  text-shadow: 0 0 100px rgba(200,150,20,.2), 0 2px 4px rgba(0,0,0,.8);
+  margin-bottom:8px;
+}
+.launch-sub {
+  font-family: var(--fm); font-size:10px; letter-spacing:.5em;
+  color:var(--t3); text-transform:uppercase; margin-bottom:56px;
+}
+.launch-rule {
+  width:300px; height:1px; margin:0 auto 48px;
+  background:linear-gradient(90deg, transparent, var(--a3), var(--a1), var(--a3), transparent);
+}
+.launch-menu { display:flex; flex-direction:column; gap:8px; align-items:center; }
+.launch-btn {
+  width:280px; padding:13px 24px 13px 20px;
+  background: linear-gradient(135deg, var(--s2), var(--s1));
+  border:1px solid var(--b2); color:var(--t2);
+  font-family:var(--fm); font-size:11px; letter-spacing:.18em;
+  cursor:pointer; text-align:left; transition:all var(--anim);
+  display:flex; align-items:center; gap:14px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+}
+.launch-btn:hover {
+  background:linear-gradient(135deg, var(--s4), var(--s3));
+  border-color:var(--b3); color:var(--t1);
+  box-shadow: 4px 0 0 0 var(--b3) inset;
+}
+.launch-btn.primary {
+  border-color:var(--a3); color:var(--a1);
+  background:linear-gradient(135deg, rgba(30,20,5,.9), var(--s1));
+}
+.launch-btn.primary:hover {
+  border-color:var(--a2); color:var(--a2);
+  background:linear-gradient(135deg, rgba(50,32,5,.9), var(--s2));
+  box-shadow: 0 0 20px rgba(180,130,10,.1), 4px 0 0 0 var(--a3) inset;
+}
+.launch-btn-icon { font-size:16px; opacity:.7; flex-shrink:0; }
+.launch-btn-label { flex:1; }
+.launch-btn-arrow { font-size:12px; opacity:.3; }
+.launch-version { font-family:var(--fm); font-size:9px; color:var(--t4); margin-top:40px; letter-spacing:.2em; }
+
+/* ═══════════════════════════════════════════════════
+   NEW GAME OVERLAY
+═══════════════════════════════════════════════════ */
+#screen-new-game {
+  align-items:center; justify-content:center;
+  background:rgba(3,5,10,.92); backdrop-filter:blur(4px);
+}
+.modal {
+  background:var(--s2); border:1px solid var(--b2);
+  width:520px; max-height:90vh; overflow-y:auto;
+  animation:reveal .25s cubic-bezier(.16,1,.3,1) both;
+  box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px var(--b1);
+}
+.modal-hd {
+  padding:24px 28px 18px;
+  border-bottom:1px solid var(--b1);
+  background:linear-gradient(180deg, var(--s3), var(--s2));
+}
+.modal-title { font-family:var(--fd); font-size:18px; font-weight:600; color:var(--a2); letter-spacing:.1em; }
+.modal-sub { font-family:var(--fm); font-size:9px; color:var(--t3); letter-spacing:.18em; text-transform:uppercase; margin-top:3px; }
+.modal-body { padding:22px 28px; }
+.modal-ft { padding:16px 28px; border-top:1px solid var(--b1); display:flex; justify-content:space-between; gap:12px; background:var(--s1); }
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:9px; letter-spacing:.24em; color:var(--t3); text-transform:uppercase; margin-bottom:6px; }
+.field input {
+  width:100%; padding:10px 14px;
+  background:var(--s1); border:1px solid var(--b1);
+  color:var(--t1); font-family:var(--fm); font-size:13px;
+  outline:none; transition:border-color var(--anim-fast);
+  border-radius:var(--r);
+}
+.field input:focus { border-color:var(--b4); box-shadow:0 0 0 2px rgba(60,80,128,.15); }
+.field .hint { font-size:9px; color:var(--t4); margin-top:5px; }
+.frow { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS — SYSTEM
+═══════════════════════════════════════════════════ */
+.btn {
+  padding:9px 18px; background:var(--s3); border:1px solid var(--b2);
+  color:var(--t2); font-family:var(--fm); font-size:11px; letter-spacing:.1em;
+  cursor:pointer; transition:all var(--anim-fast); outline:none; border-radius:var(--r);
+}
+.btn:hover { background:var(--s5); border-color:var(--b3); color:var(--t1); }
+.btn.primary { border-color:var(--a3); color:var(--a1); background:rgba(20,12,2,.6); }
+.btn.primary:hover { border-color:var(--a2); color:var(--a2); background:rgba(40,24,4,.8); box-shadow:0 0 12px rgba(180,130,10,.1); }
+.btn.sm { padding:6px 14px; font-size:10px; }
+.btn.xs { padding:4px 10px; font-size:9px; }
+.btn.icon-btn { width:30px; height:30px; padding:0; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.btn[disabled] { opacity:.3; cursor:not-allowed; pointer-events:none; }
+.btn.danger:hover { border-color:var(--bad); color:var(--badb); }
+
+/* END TURN — dominant action */
+#btn-end-turn {
+  height:40px; padding:0 28px; margin-left:16px;
+  background:linear-gradient(135deg, rgba(80,48,4,.9), rgba(50,30,2,.9));
+  border:1px solid var(--a3); color:var(--a2);
+  font-family:var(--fm); font-size:12px; font-weight:600; letter-spacing:.2em;
+  cursor:pointer; transition:all var(--anim-fast);
+  box-shadow:0 0 20px rgba(180,130,10,.08), inset 0 1px 0 rgba(255,200,80,.08);
+  border-radius:var(--r); white-space:nowrap;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+#btn-end-turn:hover {
+  background:linear-gradient(135deg, rgba(110,65,5,1), rgba(70,40,2,1));
+  border-color:var(--a2); color:var(--a2);
+  box-shadow:0 0 30px rgba(200,150,10,.18);
+}
+
+/* ═══════════════════════════════════════════════════
+   GAME SCREEN LAYOUT
+═══════════════════════════════════════════════════ */
+#screen-game { flex-direction:column; }
+
+/* TOOLBAR */
+#toolbar {
+  height:var(--toolbar-h); flex-shrink:0;
+  background:linear-gradient(180deg, var(--s3), var(--s2));
+  border-bottom:1px solid var(--b1);
+  display:flex; align-items:center; padding:0 18px 0 16px;
+  z-index:100;
+  box-shadow:0 2px 16px rgba(0,0,0,.4);
+}
+.tb-brand {
+  font-family:var(--fd); font-size:15px; font-weight:700; color:var(--a2);
+  letter-spacing:.18em; padding-right:20px; margin-right:20px;
+  border-right:1px solid var(--b2); flex-shrink:0;
+  text-shadow:0 0 20px rgba(180,130,10,.2);
+}
+.tb-divider { width:1px; height:28px; background:var(--b1); margin:0 6px; flex-shrink:0; }
+.tb-group { display:flex; align-items:center; gap:0; }
+.tb-stat {
+  display:flex; flex-direction:column; align-items:flex-start;
+  padding:0 16px; border-right:1px solid var(--b1); flex-shrink:0;
+}
+.tb-stat-label { font-size:8px; letter-spacing:.2em; color:var(--t4); text-transform:uppercase; line-height:1; margin-bottom:3px; }
+.tb-stat-value { font-size:13px; color:var(--t1); letter-spacing:.06em; line-height:1; }
+.tb-stat-value.gold { color:var(--a2); }
+.tb-stat-value.danger { color:var(--badb); }
+.tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.tb-save-btn {
+  height:32px; padding:0 14px;
+  background:var(--s3); border:1px solid var(--b2); color:var(--t3);
+  font-family:var(--fm); font-size:9px; letter-spacing:.14em;
+  cursor:pointer; transition:all var(--anim-fast); border-radius:var(--r);
+}
+.tb-save-btn:hover { border-color:var(--b3); color:var(--t2); background:var(--s4); }
+
+/* GAME BODY */
+#game-body { flex:1; position:relative; overflow:hidden; }
+
+/* MAP */
+#map-wrap {
+  position:absolute; inset:0;
+  cursor:grab; overflow:hidden; background:var(--s0);
+  transition:right var(--anim) cubic-bezier(.16,1,.3,1);
+}
+#map-wrap.dragging { cursor:grabbing; }
+#map-canvas { position:absolute; top:0; left:0; }
+
+/* Map vignette */
+#map-vignette {
+  position:absolute; inset:0; pointer-events:none; z-index:2;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(5,7,13,.55) 100%);
+}
+
+/* SIDE PANEL — slides in from right */
+#side-panel {
+  position:absolute; top:0; right:0; bottom:0;
+  width:var(--panel-w);
+  background:var(--s2);
+  border-left:1px solid var(--b2);
+  display:flex; flex-direction:column;
+  transform:translateX(100%);
+  transition:transform var(--anim) cubic-bezier(.16,1,.3,1);
+  z-index:50;
+  box-shadow:-8px 0 40px rgba(0,0,0,.5);
+}
+#side-panel.open {
+  transform:translateX(0);
+}
+/* When side panel opens, map shrinks to leave 20% visible */
+#map-wrap.panel-open {
+  right:var(--panel-w);
+}
+
+/* Panel header */
+.panel-hd {
+  height:52px; flex-shrink:0;
+  background:linear-gradient(180deg, var(--s3), var(--s2));
+  border-bottom:1px solid var(--b1);
+  display:flex; align-items:center; padding:0 18px;
+  gap:12px;
+}
+.panel-hd-title { font-family:var(--fd); font-size:15px; font-weight:600; color:var(--a2); letter-spacing:.1em; flex:1; }
+.panel-hd-sub { font-size:9px; color:var(--t3); letter-spacing:.14em; text-transform:uppercase; }
+.panel-close {
+  width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--t3); font-size:16px; transition:color var(--anim-fast);
+  border:1px solid transparent; border-radius:var(--r);
+}
+.panel-close:hover { color:var(--t1); border-color:var(--b2); background:var(--s4); }
+
+/* City nav tabs */
+#city-tabs {
+  display:flex; flex-shrink:0;
+  background:var(--s1); border-bottom:1px solid var(--b1);
+  overflow-x:auto; scrollbar-width:none;
+}
+#city-tabs::-webkit-scrollbar { display:none; }
+.city-tab {
+  padding:10px 16px; font-size:10px; letter-spacing:.1em;
+  color:var(--t3); cursor:pointer; white-space:nowrap;
+  border-bottom:2px solid transparent; transition:all var(--anim-fast);
+  flex-shrink:0; background:none; border-top:none; border-left:none; border-right:none;
+  font-family:var(--fm);
+}
+.city-tab:hover { color:var(--t2); background:var(--s3); }
+.city-tab.active { color:var(--a2); border-bottom-color:var(--a1); background:var(--s2); }
+/* HQ tabs visually separated */
+.city-tab.hq-tab { border-left:1px solid var(--b1); }
+
+/* Panel body — scrollable content area */
+.panel-body { flex:1; overflow-y:auto; }
+.panel-body::-webkit-scrollbar { width:3px; }
+.panel-body::-webkit-scrollbar-track { background:transparent; }
+.panel-body::-webkit-scrollbar-thumb { background:var(--b2); }
+
+/* Tab panels */
+.tab-panel { display:none; padding:20px; }
+.tab-panel.active { display:block; }
+
+/* Section within panel */
+.sec { margin-bottom:24px; }
+.sec-title {
+  font-size:9px; letter-spacing:.24em; color:var(--t3); text-transform:uppercase;
+  margin-bottom:10px; padding-bottom:7px; border-bottom:1px solid var(--b1);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.sec-title-action { cursor:pointer; color:var(--a1); font-size:9px; letter-spacing:.1em; }
+.sec-title-action:hover { color:var(--a2); }
+
+/* ═══════════════════════════════════════════════════
+   DETAILS POPUP — floats over map, fixed bottom-left
+═══════════════════════════════════════════════════ */
+#details-popup {
+  position:absolute; bottom:36px; left:20px;
+  width:280px; z-index:60;
+  background:var(--s2); border:1px solid var(--b2);
+  box-shadow:0 8px 40px rgba(0,0,0,.6), 0 0 0 1px var(--b1);
+  animation:popin var(--anim-fast) cubic-bezier(.16,1,.3,1) both;
+  display:none;
+}
+@keyframes popin { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.popup-hd {
+  padding:14px 16px 10px;
+  background:linear-gradient(180deg,var(--s3),var(--s2));
+  border-bottom:1px solid var(--b1);
+  position:relative;
+}
+.popup-name { font-family:var(--fd); font-size:14px; font-weight:600; color:var(--a2); margin-bottom:2px; }
+.popup-type { font-size:9px; letter-spacing:.2em; color:var(--t3); text-transform:uppercase; }
+.popup-close {
+  position:absolute; top:10px; right:10px; width:22px; height:22px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--t3); font-size:14px; transition:color var(--anim-fast);
+}
+.popup-close:hover { color:var(--t1); }
+.popup-body { padding:12px 16px; }
+.popup-row {
+  font-size:10px; color:var(--t3); display:flex; justify-content:space-between;
+  align-items:center; margin-bottom:7px;
+}
+.popup-row:last-child { margin-bottom:0; }
+.pv { color:var(--t2); }
+.pv.gold { color:var(--a2); }
+.pv.ok { color:var(--okb); }
+.pv.dim { color:var(--t4); }
+.pv.warn { color:var(--warnb); }
+.popup-ft { padding:12px 16px; border-top:1px solid var(--b1); background:var(--s1); }
+/* Discovered/undiscovered indicator bar */
+.popup-status-bar {
+  height:2px; background:var(--b1); margin-bottom:12px;
+  position:relative; overflow:hidden;
+}
+.popup-status-fill { height:100%; background:var(--a1); }
+
+/* ═══════════════════════════════════════════════════
+   MARKET
+═══════════════════════════════════════════════════ */
+.market-cats { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+.market-cat {
+  padding:5px 14px; background:var(--s1); border:1px solid var(--b1);
+  color:var(--t3); font-family:var(--fm); font-size:9px; letter-spacing:.14em;
+  cursor:pointer; transition:all var(--anim-fast); text-transform:uppercase; border-radius:var(--r);
+}
+.market-cat.active { border-color:var(--a3); color:var(--a2); background:rgba(30,18,2,.6); }
+.market-cat:hover:not(.active) { border-color:var(--b2); color:var(--t2); }
+.item-list { display:flex; flex-direction:column; gap:4px; margin-bottom:16px; }
+.item-row {
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  background:var(--s1); border:1px solid var(--b1);
+  cursor:pointer; transition:all var(--anim-fast); border-radius:var(--r);
+}
+.item-row:hover { background:var(--s4); border-color:var(--b2); }
+.item-row.staged { border-color:var(--a3); background:rgba(20,12,2,.7); }
+.item-row-name { font-family:var(--fb); font-size:13px; color:var(--t1); flex:1; font-weight:400; }
+.item-row-tags { font-size:9px; color:var(--t3); flex:2; line-height:1.4; }
+.item-row-gold { font-size:11px; color:var(--a2); white-space:nowrap; flex-shrink:0; }
+.item-row-size { font-size:9px; color:var(--t4); width:36px; text-align:right; flex-shrink:0; }
+.purchase-box {
+  background:var(--s1); border:1px solid var(--b1); padding:14px;
+  border-radius:var(--r);
+}
+.purchase-box-title { font-size:9px; letter-spacing:.2em; color:var(--t3); text-transform:uppercase; margin-bottom:10px; }
+.purchase-staged { min-height:48px; margin-bottom:10px; }
+.purchase-staged-empty { font-size:10px; color:var(--t4); padding:8px 0; font-style:italic; }
+.purchase-staged-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:5px 0; border-bottom:1px solid var(--b1); font-size:11px;
+}
+.purchase-staged-item:last-child { border-bottom:none; }
+.psi-name { color:var(--t2); font-family:var(--fb); }
+.psi-gold { color:var(--a2); font-size:10px; }
+.psi-remove { color:var(--t4); cursor:pointer; font-size:12px; transition:color var(--anim-fast); }
+.psi-remove:hover { color:var(--badb); }
+.purchase-total { display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; }
+.purchase-total .ptv { color:var(--a2); }
+.purchase-tax { font-size:9px; color:var(--t4); margin-bottom:10px; }
+.purchase-actions { display:flex; gap:8px; }
+
+/* ═══════════════════════════════════════════════════
+   RECRUITS / ROSTER
+═══════════════════════════════════════════════════ */
+.recruit-list { display:flex; flex-direction:column; gap:6px; }
+.recruit-card {
+  display:flex; align-items:flex-start; gap:12px; padding:12px;
+  background:var(--s1); border:1px solid var(--b1);
+  cursor:pointer; transition:all var(--anim-fast); border-radius:var(--r);
+}
+.recruit-card:hover { background:var(--s4); border-color:var(--b2); }
+.recruit-portrait {
+  width:36px; height:36px; flex-shrink:0;
+  transform:rotate(45deg); background:var(--s4); border:1px solid var(--b2);
+  display:flex; align-items:center; justify-content:center;
+}
+.recruit-portrait span { transform:rotate(-45deg); font-size:14px; color:var(--t3); }
+.recruit-info { flex:1; min-width:0; }
+.recruit-name { font-family:var(--fb); font-size:14px; color:var(--t1); margin-bottom:2px; }
+.recruit-level { font-size:9px; color:var(--t3); letter-spacing:.12em; margin-bottom:5px; }
+.recruit-traits { display:flex; gap:4px; flex-wrap:wrap; }
+.trait { padding:2px 8px; background:var(--s3); border:1px solid var(--b2); font-size:9px; color:var(--t2); border-radius:var(--r); }
+.recruit-cost { font-size:12px; color:var(--a2); margin-top:6px; }
+/* Roster table */
+.data-table { width:100%; border-collapse:collapse; font-size:11px; }
+.data-table th {
+  font-size:8px; letter-spacing:.2em; color:var(--t3); text-transform:uppercase;
+  padding:7px 10px; border-bottom:1px solid var(--b1); text-align:left;
+  font-family:var(--fm); font-weight:400;
+}
+.data-table td { padding:8px 10px; border-bottom:1px solid var(--b1); color:var(--t2); }
+.data-table tr:hover td { background:var(--s3); color:var(--t1); }
+.data-table tr:last-child td { border-bottom:none; }
+.badge {
+  padding:2px 8px; font-size:8px; letter-spacing:.1em; text-transform:uppercase;
+  border:1px solid; display:inline-block; border-radius:var(--r);
+}
+.badge-ok { color:var(--okb); border-color:var(--ok); background:rgba(30,80,40,.2); }
+.badge-blue { color:var(--blueb); border-color:var(--blue); background:rgba(20,50,80,.2); }
+.badge-warn { color:var(--warnb); border-color:var(--warn); background:rgba(80,50,10,.2); }
+.badge-bad { color:var(--badb); border-color:var(--bad); background:rgba(80,20,20,.2); }
+.loyalty-bar { width:48px; height:3px; background:var(--b1); display:inline-block; vertical-align:middle; margin-left:6px; border-radius:2px; overflow:hidden; }
+.loyalty-fill { height:100%; background:var(--ok); border-radius:2px; }
+
+/* ═══════════════════════════════════════════════════
+   STOREROOM
+═══════════════════════════════════════════════════ */
+.storeroom-split { display:flex; flex-direction:column; gap:14px; }
+.inv-list { display:flex; flex-direction:column; gap:3px; }
+.inv-row {
+  display:flex; align-items:center; gap:8px; padding:7px 10px;
+  background:var(--s1); border:1px solid var(--b1); border-radius:var(--r);
+}
+.inv-row-name { font-family:var(--fb); font-size:13px; color:var(--t1); flex:1; }
+.inv-row-qty { font-size:10px; color:var(--t3); width:24px; text-align:center; }
+.inv-row-gold { font-size:10px; color:var(--a2); width:60px; text-align:right; flex-shrink:0; }
+.inv-row-action { font-size:9px; color:var(--t4); cursor:pointer; transition:color var(--anim-fast); margin-left:4px; }
+.inv-row-action:hover { color:var(--a2); }
+.sale-box { background:var(--s1); border:1px solid var(--b1); padding:12px; border-radius:var(--r); }
+.sale-box-title { font-size:9px; letter-spacing:.2em; color:var(--t3); text-transform:uppercase; margin-bottom:8px; }
+.sale-empty { font-size:10px; color:var(--t4); font-style:italic; padding:6px 0; }
+.sale-total-row { display:flex; justify-content:space-between; font-size:10px; margin-top:8px; margin-bottom:10px; }
+.sale-total-row .stv { color:var(--a2); }
+
+/* ═══════════════════════════════════════════════════
+   LEDGER
+═══════════════════════════════════════════════════ */
+.ledger-row { padding:7px 0; border-bottom:1px solid var(--b1); display:flex; align-items:baseline; gap:8px; font-size:11px; }
+.ledger-row:last-child { border-bottom:none; }
+.ledger-turn { font-size:9px; color:var(--t4); width:32px; flex-shrink:0; }
+.ledger-desc { color:var(--t2); flex:1; font-family:var(--fb); }
+.ledger-amount { font-size:11px; width:60px; text-align:right; flex-shrink:0; }
+.ledger-in { color:var(--okb); }
+.ledger-out { color:var(--badb); }
+.ledger-balance { font-size:10px; color:var(--a2); width:60px; text-align:right; flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════
+   GROUP MANAGER
+═══════════════════════════════════════════════════ */
+.group-card {
+  background:var(--s1); border:1px solid var(--b1);
+  margin-bottom:8px; border-radius:var(--r); overflow:hidden;
+}
+.group-card-hd {
+  padding:12px 14px; display:flex; align-items:flex-start; gap:10px;
+  background:linear-gradient(135deg, var(--s3), var(--s1));
+  border-bottom:1px solid var(--b1);
+}
+.group-card-name { font-family:var(--fd); font-size:13px; color:var(--t1); flex:1; }
+.group-card-role { font-size:8px; letter-spacing:.16em; color:var(--t3); text-transform:uppercase; }
+.group-card-loc { font-size:9px; color:var(--t3); }
+.group-card-body { padding:10px 14px; }
+.group-members-row { display:flex; gap:6px; margin-bottom:8px; align-items:center; }
+.member-token {
+  width:26px; height:26px; transform:rotate(45deg);
+  background:var(--s4); border:1px solid var(--b2);
+  display:flex; align-items:center; justify-content:center;
+}
+.member-token span { transform:rotate(-45deg); font-size:10px; color:var(--t2); }
+.member-token.empty { border-style:dashed; opacity:.3; }
+.group-task { font-size:10px; color:var(--t2); font-family:var(--fb); }
+.group-task-label { font-size:8px; color:var(--t4); letter-spacing:.12em; text-transform:uppercase; margin-bottom:2px; }
+.group-card-ft { padding:8px 14px; border-top:1px solid var(--b1); display:flex; gap:6px; }
+
+/* ═══════════════════════════════════════════════════
+   STAFF TASKS
+═══════════════════════════════════════════════════ */
+.staff-list { display:flex; flex-direction:column; gap:8px; }
+.staff-card { background:var(--s1); border:1px solid var(--b1); padding:12px 14px; border-radius:var(--r); }
+.staff-card-name { font-family:var(--fb); font-size:14px; color:var(--t1); margin-bottom:3px; }
+.staff-card-desc { font-size:11px; color:var(--t3); line-height:1.5; margin-bottom:8px; font-family:var(--fb); }
+.staff-agents { display:flex; gap:5px; margin-bottom:8px; flex-wrap:wrap; }
+.staff-slot {
+  width:24px; height:24px; transform:rotate(45deg);
+  background:var(--s3); border:1px solid var(--b2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:border-color var(--anim-fast);
+}
+.staff-slot:hover { border-color:var(--b4); }
+.staff-slot.filled { border-color:var(--a3); background:rgba(20,12,2,.7); }
+.staff-slot span { transform:rotate(-45deg); font-size:9px; color:var(--t3); }
+
+/* ═══════════════════════════════════════════════════
+   POI ZONE VIEW — inside side panel
+═══════════════════════════════════════════════════ */
+#zone-canvas-wrap { flex:1; position:relative; min-height:200px; background:var(--s0); }
+#zone-canvas { width:100%; height:100%; position:absolute; inset:0; }
+.zone-detail-sec { padding:16px 20px; }
+.zone-cond { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:10px; }
+.zone-cond-label { color:var(--t3); width:72px; flex-shrink:0; }
+.prog { flex:1; height:4px; background:var(--b1); border-radius:2px; overflow:hidden; }
+.prog-fill { height:100%; border-radius:2px; }
+.prog-gold { background:var(--a1); }
+.prog-ok { background:var(--ok); }
+.prog-bad { background:var(--bad); }
+.zone-obj-list { display:flex; flex-direction:column; gap:3px; }
+.zone-obj-row {
+  display:flex; align-items:center; gap:8px; padding:6px 8px;
+  background:var(--s1); border:1px solid var(--b1); cursor:pointer;
+  transition:all var(--anim-fast); border-radius:var(--r);
+}
+.zone-obj-row:hover { background:var(--s4); border-color:var(--b2); }
+.zone-obj-icon {
+  width:20px; height:20px; background:var(--s3); border:1px solid var(--b2);
+  display:flex; align-items:center; justify-content:center; font-size:9px; flex-shrink:0;
+}
+.zone-obj-icon.rhombus { transform:rotate(45deg); }
+.zone-obj-icon.rhombus span { transform:rotate(-45deg); }
+.zone-obj-name { font-family:var(--fb); font-size:12px; color:var(--t1); flex:1; }
+.zone-obj-meta { font-size:9px; color:var(--t3); }
+.action-list { display:flex; flex-direction:column; gap:3px; }
+.action-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; background:var(--s1); border:1px solid var(--b1);
+  cursor:pointer; transition:all var(--anim-fast); border-radius:var(--r);
+}
+.action-row:hover { background:var(--s4); border-color:var(--b3); }
+.action-name { font-size:11px; color:var(--t1); font-family:var(--fb); }
+.action-cost { font-size:9px; color:var(--t4); }
+
+/* ═══════════════════════════════════════════════════
+   STATUS BAR
+═══════════════════════════════════════════════════ */
+#statusbar {
+  height:var(--statusbar-h); flex-shrink:0;
+  background:var(--s1); border-top:1px solid var(--b1);
+  display:flex; align-items:center; padding:0 16px;
+  font-size:9px; color:var(--t4); gap:16px; letter-spacing:.06em;
+}
+.sb-dot { color:var(--b2); }
+.sb-hint { margin-left:auto; }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+#toast {
+  position:fixed; bottom:36px; left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:var(--s3); border:1px solid var(--b3);
+  padding:9px 22px; font-size:11px; color:var(--t1);
+  opacity:0; transition:all .18s; pointer-events:none;
+  white-space:nowrap; z-index:999; letter-spacing:.06em;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ═══════════════════════════════════════════════════
+   DEV PANEL
+═══════════════════════════════════════════════════ */
+#dev-panel {
+  position:fixed; bottom:0; left:0; right:0; height:260px;
+  background:#040610; border-top:2px solid #5a1414;
+  font-family:var(--fm); font-size:11px;
+  display:none; flex-direction:column; z-index:9999;
+}
+#dev-panel.open { display:flex; }
+#dev-tb {
+  height:34px; background:#07080f; border-bottom:1px solid #141c28;
+  display:flex; align-items:center; padding:0 12px; gap:8px;
+}
+#dev-tb .dtitle { color:#5a1414; font-size:10px; letter-spacing:.18em; margin-right:6px; }
+.dbtn {
+  padding:3px 10px; background:#0c0f18; border:1px solid #1e1010;
+  color:#a04040; font-family:var(--fm); font-size:10px;
+  cursor:pointer; transition:all var(--anim-fast); border-radius:2px;
+}
+.dbtn:hover { background:#180c0c; border-color:#5a1414; color:#d06060; }
+.dbtn.ok { border-color:#102010; color:#508050; }
+.dbtn.ok:hover { background:#0c180c; border-color:#206820; color:#70c070; }
+#dev-body { display:flex; flex:1; overflow:hidden; }
+#dev-log { flex:1; overflow-y:auto; padding:8px 12px; line-height:1.75; font-size:10px; }
+#dev-right { width:180px; border-left:1px solid #141c28; padding:8px; overflow-y:auto; }
+#dev-right .dtitle2 { font-size:8px; letter-spacing:.18em; color:#2e3a4e; text-transform:uppercase; margin-bottom:5px; }
+.dinj {
+  display:block; width:100%; padding:5px 8px; margin-bottom:3px;
+  background:#0c0f18; border:1px solid #1c2333; color:#4a6080;
+  font-family:var(--fm); font-size:10px; cursor:pointer; text-align:left;
+  transition:all var(--anim-fast); border-radius:2px;
+}
+.dinj:hover { border-color:#243448; color:#7aa0c0; }
+.dle { margin-bottom:1px; }
+.dle.pass { color:#3a7a3a; } .dle.fail { color:#a04040; }
+.dle.warn { color:#806010; } .dle.info { color:#3a5060; }
+.dle.head { color:#6070a0; border-top:1px solid #141c28; margin-top:4px; padding-top:3px; }
+#dev-badge {
+  position:fixed; bottom:4px; right:8px;
+  background:#180808; border:1px solid #3a1010; color:#5a1414;
+  font-family:var(--fm); font-size:9px; padding:3px 8px;
+  cursor:pointer; z-index:9998; letter-spacing:.1em; display:none; border-radius:2px;
+}
+#dev-badge:hover { color:#903030; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LAUNCH ═══════════════ -->
+<div id="screen-launch" class="screen active">
+  <div class="launch-noise"></div>
+  <div class="launch-grid"></div>
+  <div class="launch-inner">
+    <div class="launch-emblem"><span>⚔</span></div>
+    <div class="launch-title">IRONBOUND</div>
+    <div class="launch-sub">Mercenary Guild Management</div>
+    <div class="launch-rule"></div>
+    <div class="launch-menu">
+      <button class="launch-btn primary" onclick="showScreen('new-game')">
+        <span class="launch-btn-icon">▶</span>
+        <span class="launch-btn-label">START NEW GAME</span>
+        <span class="launch-btn-arrow">›</span>
+      </button>
+      <button class="launch-btn" onclick="document.getElementById('load-input').click()">
+        <span class="launch-btn-icon">⟳</span>
+        <span class="launch-btn-label">LOAD GAME</span>
+        <span class="launch-btn-arrow">›</span>
+      </button>
+      <button class="launch-btn" onclick="showToast('No test scenarios defined yet.')">
+        <span class="launch-btn-icon">⚙</span>
+        <span class="launch-btn-label">TEST SCENARIO</span>
+        <span class="launch-btn-arrow">›</span>
+      </button>
+    </div>
+    <div class="launch-version">v0.2 — UI PROTOTYPE</div>
+    <input type="file" id="load-input" accept=".json" style="display:none" onchange="loadGame(event)">
+  </div>
+</div>
+
+<!-- ═══════════════ NEW GAME ═══════════════ -->
+<div id="screen-new-game" class="screen">
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,5,10,.92);backdrop-filter:blur(4px);">
+    <div class="modal">
+      <div class="modal-hd">
+        <div class="modal-title">WORLD OPTIONS</div>
+        <div class="modal-sub">Configure your starting conditions</div>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Organization Name</label>
+          <input type="text" id="f-orgname" value="The Guild" maxlength="32">
+        </div>
+        <div class="frow">
+          <div class="field">
+            <label>Starting Gold</label>
+            <input type="number" id="f-gold" value="4200" min="0">
+          </div>
+          <div class="field">
+            <label>Starting Characters</label>
+            <input type="number" id="f-chars" value="3" min="0" max="9">
+            <div class="hint">0 – 9 random recruits at HQ</div>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="field">
+            <label>Target World POIs</label>
+            <input type="number" id="f-pois" value="20" min="10" max="50">
+          </div>
+          <div class="field">
+            <label>Known POIs</label>
+            <input type="number" id="f-known" value="8" min="6" max="20">
+          </div>
+        </div>
+        <div class="field">
+          <label>Map Size (tiles)</label>
+          <input type="number" id="f-mapsize" value="128" min="64" max="256">
+          <div class="hint">64 – 256, square map</div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn sm" onclick="showScreen('launch')">‹ BACK</button>
+        <button class="btn sm primary" onclick="startGame()">▶ BEGIN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ GAME ═══════════════ -->
+<div id="screen-game" class="screen">
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <div class="tb-brand">IRONBOUND</div>
+
+    <div class="tb-stat">
+      <span class="tb-stat-label">Turn</span>
+      <span class="tb-stat-value" id="tb-turn">1</span>
+    </div>
+    <div class="tb-stat">
+      <span class="tb-stat-label">Day</span>
+      <span class="tb-stat-value" id="tb-day">1</span>
+    </div>
+    <div class="tb-stat">
+      <span class="tb-stat-label">Gold</span>
+      <span class="tb-stat-value gold" id="tb-gold">4,200</span>
+    </div>
+    <div class="tb-stat">
+      <span class="tb-stat-label">Roster</span>
+      <span class="tb-stat-value" id="tb-roster">0</span>
+    </div>
+    <div class="tb-stat">
+      <span class="tb-stat-label">HQ</span>
+      <span class="tb-stat-value" id="tb-hq">—</span>
+    </div>
+
+    <div class="tb-right">
+      <button class="tb-save-btn" onclick="saveGame()">SAVE</button>
+      <button id="btn-end-turn" onclick="endTurn()">END TURN ›</button>
+    </div>
+  </div>
+
+  <!-- GAME BODY: MAP + SIDE PANEL -->
+  <div id="game-body">
+
+    <!-- MAP — always visible -->
+    <div id="map-wrap">
+      <canvas id="map-canvas"></canvas>
+      <div id="map-vignette"></div>
+    </div>
+
+    <!-- DETAILS POPUP — anchored bottom-left over map -->
+    <div id="details-popup">
+      <div class="popup-hd">
+        <div class="popup-name" id="dp-name">—</div>
+        <div class="popup-type" id="dp-type">—</div>
+        <div class="popup-close" onclick="closePopup()">✕</div>
+      </div>
+      <div class="popup-status-bar"><div class="popup-status-fill" id="dp-status-fill" style="width:0"></div></div>
+      <div class="popup-body">
+        <div class="popup-row">Size <span class="pv" id="dp-size">—</span></div>
+        <div class="popup-row" id="dp-zones-row">Zones <span class="pv" id="dp-zones">—</span></div>
+        <div class="popup-row">Despawn <span class="pv" id="dp-despawn">—</span></div>
+        <div class="popup-row">Status <span class="pv" id="dp-status">—</span></div>
+      </div>
+      <div class="popup-ft">
+        <div id="dp-action"></div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div id="side-panel">
+      <div class="panel-hd">
+        <div>
+          <div class="panel-hd-title" id="sp-title">—</div>
+          <div class="panel-hd-sub" id="sp-sub">—</div>
+        </div>
+        <div class="panel-close" onclick="closeSidePanel()" title="Close panel">✕</div>
+      </div>
+
+      <!-- CITY TABS -->
+      <div id="city-tabs" style="display:none">
+        <button class="city-tab active" data-tab="market" onclick="cityTab(this)">Market</button>
+        <button class="city-tab" data-tab="tavern" onclick="cityTab(this)">Tavern</button>
+        <button class="city-tab hq-tab" data-tab="roster" onclick="cityTab(this)">Roster</button>
+        <button class="city-tab" data-tab="storeroom" onclick="cityTab(this)">Storeroom</button>
+        <button class="city-tab" data-tab="ledger" onclick="cityTab(this)">Ledger</button>
+        <button class="city-tab" data-tab="groups" onclick="cityTab(this)">Groups</button>
+        <button class="city-tab" data-tab="staff" onclick="cityTab(this)">Staff</button>
+      </div>
+
+      <!-- PANEL BODY -->
+      <div class="panel-body">
+
+        <!-- CITY: MARKET -->
+        <div class="tab-panel active" id="tp-market">
+          <div class="sec">
+            <div class="sec-title">Stock Category</div>
+            <div class="market-cats">
+              <button class="market-cat active" onclick="mktCat('perm',this)">Permanent</button>
+              <button class="market-cat" onclick="mktCat('rot',this)">Rotating</button>
+              <button class="market-cat" onclick="mktCat('rare',this)">Rare</button>
+            </div>
+            <div class="item-list" id="mkt-items"></div>
+          </div>
+          <div class="sec">
+            <div class="sec-title">For Purchase <span class="sec-title-action" onclick="clearPurchase()">Clear</span></div>
+            <div class="purchase-box">
+              <div class="purchase-staged" id="pur-staged">
+                <div class="purchase-staged-empty">Stage items above to purchase them.</div>
+              </div>
+              <div class="purchase-total">
+                <span style="color:var(--t3);font-size:10px">Price range</span>
+                <span class="ptv" id="pur-total">0 – 0 gold</span>
+              </div>
+              <div class="purchase-tax" id="pur-tax">Tax (10%): max 0 gold</div>
+              <div class="purchase-actions">
+                <button class="btn sm primary" style="flex:1" onclick="confirmPurchase()">▶ BUY</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CITY: TAVERN -->
+        <div class="tab-panel" id="tp-tavern">
+          <div class="sec">
+            <div class="sec-title">Available Recruits <span style="color:var(--t4);font-weight:400">— refreshes weekly</span></div>
+            <div class="recruit-list" id="tavern-list"></div>
+          </div>
+        </div>
+
+        <!-- CITY: ROSTER -->
+        <div class="tab-panel" id="tp-roster">
+          <div class="sec">
+            <div class="sec-title">Guild Roster</div>
+            <table class="data-table">
+              <thead><tr>
+                <th>Name</th><th>Lvl</th><th>State</th><th>Location</th><th>Loyalty</th>
+              </tr></thead>
+              <tbody id="roster-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CITY: STOREROOM -->
+        <div class="tab-panel" id="tp-storeroom">
+          <div class="storeroom-split">
+            <div class="sec">
+              <div class="sec-title">Inventory</div>
+              <div class="inv-list" id="inv-list"></div>
+            </div>
+            <div class="sec">
+              <div class="sec-title">For Sale</div>
+              <div class="sale-box">
+                <div id="sale-list"><div class="sale-empty">No items staged.</div></div>
+                <div class="sale-total-row">
+                  <span style="color:var(--t3)">Estimated value</span>
+                  <span class="stv" id="sale-total">0 – 0 gold</span>
+                </div>
+                <button class="btn sm primary" style="width:100%" onclick="confirmSale()">▶ SELL ALL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CITY: LEDGER -->
+        <div class="tab-panel" id="tp-ledger">
+          <div class="sec">
+            <div class="sec-title">Transactions</div>
+            <div id="ledger-list"></div>
+          </div>
+        </div>
+
+        <!-- CITY: GROUPS -->
+        <div class="tab-panel" id="tp-groups">
+          <div class="sec">
+            <div class="sec-title">Active Groups <span class="sec-title-action" onclick="showToast('Group creation not yet implemented.')">+ New Group</span></div>
+            <div id="group-list"></div>
+          </div>
+        </div>
+
+        <!-- CITY: STAFF -->
+        <div class="tab-panel" id="tp-staff">
+          <div class="sec">
+            <div class="sec-title">Staff Assignments</div>
+            <div class="staff-list">
+              <div class="staff-card">
+                <div class="staff-card-name">Gather Rumors</div>
+                <div class="staff-card-desc">Determines how many newly spawned POIs are Discovered. No additional effect beyond the public baseline in v1.</div>
+                <div class="staff-agents" id="staff-rumors"></div>
+                <button class="btn xs" onclick="showToast('Staff assignment not yet implemented.')">Assign Recruit</button>
+              </div>
+              <div class="staff-card">
+                <div class="staff-card-name">Develop Trading Connections</div>
+                <div class="staff-card-desc">Increases Market variety and raises chance of rare drops in weekly rotation.</div>
+                <div class="staff-agents" id="staff-trade"></div>
+                <button class="btn xs" onclick="showToast('Staff assignment not yet implemented.')">Assign Recruit</button>
+              </div>
+              <div class="staff-card">
+                <div class="staff-card-name">Train Recruits</div>
+                <div class="staff-card-desc">Slowly improves unassigned recruits over time.</div>
+                <div class="staff-agents" id="staff-train"></div>
+                <button class="btn xs" onclick="showToast('Staff assignment not yet implemented.')">Assign Recruit</button>
+              </div>
+              <div class="staff-card">
+                <div class="staff-card-name">Treat Wounded</div>
+                <div class="staff-card-desc">Reduces recovery time for injured recruits at HQ.</div>
+                <div class="staff-agents" id="staff-heal"></div>
+                <button class="btn xs" onclick="showToast('Staff assignment not yet implemented.')">Assign Recruit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POI ZONE VIEW -->
+        <div class="tab-panel" id="tp-poi">
+          <div id="zone-canvas-wrap"><canvas id="zone-canvas"></canvas></div>
+          <div class="zone-detail-sec" id="zone-detail">
+            <div style="font-size:10px;color:var(--t4);padding:16px 0;text-align:center;font-style:italic">Select a zone to inspect it.</div>
+          </div>
+        </div>
+
+      </div><!-- panel-body -->
+    </div><!-- side-panel -->
+
+  </div><!-- game-body -->
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <span>MAP <span style="color:var(--t2)" id="st-map">—</span></span>
+    <span class="sb-dot">·</span>
+    <span>SEED <span style="color:var(--t2)" id="st-seed">—</span></span>
+    <span class="sb-dot">·</span>
+    <span>POIs <span style="color:var(--t2)" id="st-pois">—</span></span>
+    <span class="sb-hint" id="st-hint">scroll to zoom · drag to pan · click to inspect</span>
+  </div>
+
+</div><!-- screen-game -->
+
+<div id="toast"></div>
+<div id="dev-badge" onclick="DEV.toggle()">DEV ▲</div>
+<div id="dev-panel">
+  <div id="dev-tb">
+    <span class="dtitle">⚠ DEV</span>
+    <button class="dbtn ok" onclick="DEV.validate()">✓ VALIDATE</button>
+    <button class="dbtn" onclick="DEV.scenario('world_gen')">▶ World Gen</button>
+    <button class="dbtn" onclick="DEV.scenario('corrupt')">▶ Corrupt</button>
+    <button class="dbtn" onclick="DEV.clear()">✕ Clear</button>
+    <button class="dbtn" style="margin-left:auto" onclick="DEV.toggle()">▼</button>
+  </div>
+  <div id="dev-body">
+    <div id="dev-log"><div class="dle info">· Dev console ready.</div></div>
+    <div id="dev-right">
+      <div class="dtitle2">Inject</div>
+      <button class="dinj" onclick="DEV.inj.rich()">Rich org</button>
+      <button class="dinj" onclick="DEV.inj.allDisc()">All discovered</button>
+      <button class="dinj" onclick="DEV.inj.negGold()">Negative gold</button>
+      <button class="dinj" onclick="DEV.inj.badPOI()">Bad POI</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── TERRAIN COLOURS ──────────────────────────────────────────────────────────
+const TC = {
+  water:'#00008C', plains:'#717F5C', forest:'#004200',
+  mountains:'#747486', snow:'#BCBECC', desert:'#B7A33E', wasteland:'#9487A3'
+};
+
+// ── MOCK DATA ────────────────────────────────────────────────────────────────
+const ITEMS_PERM = [
+  {n:'Knife',      t:'One-Handed, Sharp (100%), Melee',         g:[7,10],  s:2},
+  {n:'Rope',       t:'Climbing (70%)',                          g:[5,5],   s:3},
+  {n:'Bandage',    t:'Healing',                                 g:[5,10],  s:1},
+  {n:'Bread',      t:'Food (70), Delicious (1)',                g:[8,8],   s:2},
+  {n:'Fruits',     t:'Food (30), Delicious (1)',                g:[2,12],  s:1},
+  {n:'Meat',       t:'Food (80), Delicious (1)',                g:[6,22],  s:2},
+  {n:'Backpack',   t:'Equipment (backpack)',                    g:[20,30], s:4},
+  {n:'Bow',        t:'Hunting (100%), Ranged, Two-Handed',      g:[25,40], s:4},
+  {n:'Cloth',      t:'Equipment (garment)',                     g:[10,12], s:4},
+  {n:'Torch',      t:'Lighting (80%)',                         g:[4,4],   s:2},
+  {n:'Lamp',       t:'Lighting (100%)',                        g:[20,20], s:1},
+];
+const ITEMS_ROT = [
+  {n:'Exotic Fruits',   t:'Food (40), Delicious (3)',         g:[10,15], s:1},
+  {n:'Dried Meat',      t:'Food (100)',                       g:[15,15], s:1},
+  {n:'Fish',            t:'Food (60), Delicious (1)',         g:[6,8],   s:1},
+  {n:'Sword',           t:'Sharp (40%), Melee, Two-Handed',  g:[40,45], s:5},
+  {n:'Axe',             t:'Sharp (20%), Melee, One-Handed',  g:[15,17], s:4},
+  {n:'Leather Armor',   t:'Equipment (garment), Armor 25',   g:[20,30], s:6},
+  {n:'Chainmail',       t:'Equipment (garment), Armor 35',   g:[80,80], s:8},
+  {n:'Pickaxe',         t:'Mining (100%), Two-Handed, Melee', g:[30,30], s:6},
+  {n:'Metal Helmet',    t:'Equipment (head), Armor 30',      g:[50,50], s:3},
+  {n:'Fish Net',        t:'Fishing (100%)',                  g:[20,20], s:3},
+];
+const ITEMS_RARE = [
+  {n:'Plate Armor',    t:'Equipment (garment), Armor 50',  g:[300,300], s:9},
+  {n:'Large Backpack', t:'Equipment (backpack)',           g:[40,45],  s:5},
+  {n:'Leather Cloak',  t:'Equipment (head), Armor 20',    g:[10,20],  s:3},
+];
+const MOCK_RECRUITS = [
+  {name:'Aldric Moss',  level:6, race:'human', traits:['Strong','Watchful'], cost:120},
+  {name:'Seren Vale',   level:5, race:'human', traits:['Fast'],              cost:90},
+  {name:'Durn Ashwood', level:7, race:'human', traits:['Resilient','Greedy'],cost:160},
+  {name:'Lira Coldfen', level:5, race:'human', traits:['Dexterous'],         cost:95},
+  {name:'Bram Ironstep',level:6, race:'human', traits:['Loyal','Slow'],      cost:110},
+];
+const MOCK_ROSTER = [
+  {name:'Aldric Moss',  level:6, race:'human', state:'Available', loc:'Valdenmoor HQ',  loyalty:22},
+  {name:'Seren Vale',   level:5, race:'human', state:'Deployed',  loc:'Ironveil Hollow',loyalty:15},
+  {name:'Durn Ashwood', level:7, race:'human', state:'Wounded',   loc:'Ashrift Den',    loyalty:8},
+];
+const MOCK_INV = [
+  {n:'Bread',                    qty:6,  g:[8,8],     s:2},
+  {n:'Iron Ore',                 qty:4,  g:[8,12],    s:2},
+  {n:'Hunting Trophy (small)',   qty:2,  g:[10,15],   s:1},
+  {n:'Bandage',                  qty:3,  g:[5,10],    s:1},
+  {n:'Unidentified Artifact',    qty:1,  g:[150,300], s:1},
+];
+const MOCK_LEDGER = [
+  {turn:5, desc:'Upkeep — 3 recruits',             amt:-540, bal:3660},
+  {turn:4, desc:'Sold: Iron Ore ×3',               amt:+32,  bal:4200},
+  {turn:3, desc:'Purchased: Bandage ×5',           amt:-40,  bal:4168},
+  {turn:1, desc:'Starting balance',                amt:4200, bal:4200},
+];
+const MOCK_GROUPS = [
+  {name:'Vanguard', role:'Scout',  members:['Aldric','Seren'],  loc:'Ironveil Hollow',  task:'Gather valuables', sched:[0,0,0,0,0,1]},
+  {name:'Ironwatch',role:'Combat', members:['Durn'],            loc:'Travelling',       task:'Returning to HQ',  sched:[0,0,0,0,0,1]},
+];
+const MOCK_POI_ZONES = [
+  {id:'z0',n:'Entry Hall',      state:'Scouted',  x:180, y:240},
+  {id:'z1',n:'Collapsed Pass.', state:'Unknown',  x:300, y:170},
+  {id:'z2',n:'Flooded Chamber', state:'Scouted',  x:300, y:310},
+  {id:'z3',n:'Deep Vault',      state:'Unknown',  x:420, y:130},
+  {id:'z4',n:'Guard Room',      state:'Unknown',  x:420, y:250},
+  {id:'z5',n:'The Pit',         state:'Unknown',  x:520, y:190},
+];
+const MOCK_EDGES = [['z0','z1'],['z0','z2'],['z1','z3'],['z1','z4'],['z2','z4'],['z4','z5']];
+
+// ── WORLD GENERATION ─────────────────────────────────────────────────────────
+function rng(s){s=(s^0xdeadbeef)>>>0;return()=>{s=(Math.imul(s^(s>>>16),0x45d9f3b))>>>0;s^=s>>>15;return(s>>>0)/4294967296;};}
+
+function generateWorld(o={}){
+  const seed=o.seed||(Date.now()&0xffff),MAP=o.mapSize||128;
+  const nP=o.nPOIs||20,nK=Math.min(o.nKnown||8,nP),r=rng(seed);
+  const tiles=[];
+  for(let y=0;y<MAP;y++){tiles[y]=[];for(let x=0;x<MAP;x++){
+    const v=Math.sin(x*.09+seed*.01)*.5+Math.cos(y*.07+seed*.013)*.4+Math.sin((x+y)*.05)*.3+Math.cos((x-y)*.08)*.25;
+    const n=(v+1.45)/2.9;
+    let t='plains';if(n<.28)t='water';else if(n<.45)t='forest';else if(n>.68)t='mountains';
+    tiles[y][x]={type:t};
+  }}
+  const cd=[{id:'c0',name:'Valdenmoor',size:'large', tx:.18,ty:.18},
+             {id:'c1',name:'Ashford',   size:'medium',tx:.80,ty:.15},
+             {id:'c2',name:'Irongate',  size:'small', tx:.50,ty:.80}];
+  const cities=cd.map(c=>({...c,x:Math.floor(c.tx*MAP+(r()-.5)*MAP*.06),y:Math.floor(c.ty*MAP+(r()-.5)*MAP*.06)}));
+  const hi=Math.floor(r()*3);cities[hi].isHQ=true;
+  const pn=['Ironveil Hollow','The Pale Crossing','Sundermark','Ashrift Den','Grey Barrow','Coldfen','Embervault','The Sunken Keep','Duskfall Ridge','Thornmere','Veilstone','Crumbled Gate','Hollow Pines','Saltmere','Ashen Reach','Dreadfen','Old Garrison','Carrion Bluff','Mistfall','Wraithwood'];
+  const pt=['dungeon','ruins','camp','cave','forest zone','stronghold'];
+  const pois=[];
+  for(let i=0;i<nP;i++){let x,y,a=0;do{x=Math.floor(r()*(MAP-16))+8;y=Math.floor(r()*(MAP-16))+8;a++;}while(tiles[y]?.[x]?.type==='water'&&a<50);
+    const sz=r()<.35?'small':r()<.7?'medium':'large';
+    const d=sz==='small'?2+Math.floor(r()*8):sz==='medium'?10+Math.floor(r()*50):30+Math.floor(r()*150);
+    pois.push({id:'p'+i,name:pn[i%pn.length],type:pt[Math.floor(r()*pt.length)],x,y,size:sz,despawnTimer:d*6,discovered:i<nK,zones:3+Math.floor(r()*8)});}
+  return{seed,MAP,tiles,cities,pois,playerHQCityId:cities[hi].id};
+}
+
+// ── GAME STATE ────────────────────────────────────────────────────────────────
+let GS=null;
+function pOrg(){return GS?.organizations.find(o=>o.id===GS.playerOrgId);}
+
+function startGame(){
+  const world=generateWorld({
+    mapSize:parseInt(document.getElementById('f-mapsize').value)||128,
+    nPOIs:parseInt(document.getElementById('f-pois').value)||20,
+    nKnown:parseInt(document.getElementById('f-known').value)||8,
+  });
+  GS={
+    turn:1, world,
+    organizations:[{
+      id:'player',
+      name:document.getElementById('f-orgname').value||'The Guild',
+      gold:parseInt(document.getElementById('f-gold').value)||4200,
+      hqCityId:world.playerHQCityId,
+      recruits:MOCK_ROSTER.map((r,i)=>({...r,id:'r'+i})),
+      groups:MOCK_GROUPS.map((g,i)=>({...g,id:'g'+i,actionLog:[]})),
+      inventory:{food:[],equipment:[],weapons:[],misc:[],forSale:[]},
+      criminalRecord:[],
+      ledger:[...MOCK_LEDGER],
+    }],
+    playerOrgId:'player',
+  };
+  showScreen('game');
+  initMap();
+  updateUI();
+  renderAll();
+}
+
+function loadGame(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{GS=JSON.parse(ev.target.result);showScreen('game');initMap();updateUI();renderAll();showToast('Game loaded.');}catch{showToast('Invalid save file.');}};
+  r.readAsText(f);e.target.value='';
+}
+
+function saveGame(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(GS)],{type:'application/json'}));
+  a.download=`ironbound-t${GS.turn}.json`;a.click();showToast('Game saved.');
+}
+
+function endTurn(){
+  GS.turn++;
+  GS.world.pois.forEach(p=>{p.despawnTimer=Math.max(0,p.despawnTimer-1);});
+  updateUI();drawMap();
+  if(DEV.IS_DEV)DEV.validate();
+}
+
+// ── UI UTILITIES ──────────────────────────────────────────────────────────────
+let toastT=null;
+function showToast(m,d=2750){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),d);}
+function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
+
+function updateUI(){
+  if(!GS)return;
+  const org=pOrg(),w=GS.world,hq=w.cities.find(c=>c.id===org.hqCityId);
+  document.getElementById('tb-turn').textContent=GS.turn;
+  document.getElementById('tb-day').textContent=Math.ceil(GS.turn/6);
+  document.getElementById('tb-gold').textContent=org.gold.toLocaleString();
+  document.getElementById('tb-roster').textContent=org.recruits.length;
+  document.getElementById('tb-hq').textContent=hq?hq.name:'—';
+  const disc=w.pois.filter(p=>p.discovered).length;
+  document.getElementById('st-map').textContent=w.MAP+'×'+w.MAP;
+  document.getElementById('st-seed').textContent=w.seed;
+  document.getElementById('st-pois').textContent=disc+'/'+w.pois.length+' discovered';
+}
+
+function renderAll(){
+  renderMarket('perm');
+  renderTavern();
+  renderRoster();
+  renderInventory();
+  renderLedger();
+  renderGroups();
+  renderStaffSlots();
+}
+
+// ── SIDE PANEL ────────────────────────────────────────────────────────────────
+let panelMode=null; // 'city' | 'poi' | null
+
+function openSidePanel(mode,title,sub){
+  panelMode=mode;
+  document.getElementById('sp-title').textContent=title;
+  document.getElementById('sp-sub').textContent=sub;
+  document.getElementById('city-tabs').style.display=mode==='city'?'flex':'none';
+  // Show relevant content tab
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  if(mode==='city'){document.getElementById('tp-market').classList.add('active');
+    document.querySelectorAll('.city-tab').forEach((t,i)=>t.classList.toggle('active',i===0));}
+  else if(mode==='poi'){document.getElementById('tp-poi').classList.add('active');
+    setTimeout(drawZoneGraph,60);}
+  document.getElementById('side-panel').classList.add('open');
+  document.getElementById('map-wrap').classList.add('panel-open');
+  document.getElementById('st-hint').textContent=mode==='city'?`Viewing city: ${title}`:`Viewing POI: ${title}`;
+}
+
+function closeSidePanel(){
+  document.getElementById('side-panel').classList.remove('open');
+  document.getElementById('map-wrap').classList.remove('panel-open');
+  panelMode=null;
+  document.getElementById('st-hint').textContent='scroll to zoom · drag to pan · click to inspect';
+  setTimeout(()=>drawMap(),50);
+}
+
+function cityTab(btn){
+  document.querySelectorAll('.city-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tp-'+btn.dataset.tab).classList.add('active');
+}
+
+// ── DETAILS POPUP ─────────────────────────────────────────────────────────────
+let selObj=null;
+
+function showDetailsPopup(obj){
+  selObj=obj;
+  const isCity=obj._type==='city';
+  document.getElementById('dp-name').textContent=obj.name;
+  document.getElementById('dp-type').textContent=isCity?`city · ${obj.size||'—'} size`:obj.type;
+  document.getElementById('dp-size').textContent=obj.size||'—';
+  document.getElementById('dp-zones-row').style.display=isCity?'none':'flex';
+  if(!isCity) document.getElementById('dp-zones').textContent=obj.zones;
+  const days=isCity?null:Math.ceil(obj.despawnTimer/6);
+  const despEl=document.getElementById('dp-despawn');
+  despEl.textContent=isCity?'never':(days+' days');
+  despEl.className='pv'+((!isCity&&days<6)?' warn':'');
+  const disc=isCity||obj.discovered;
+  document.getElementById('dp-status').textContent=disc?'✓ Discovered':'✗ Undiscovered';
+  document.getElementById('dp-status').className='pv '+(disc?'ok':'dim');
+  document.getElementById('dp-status-fill').style.width=disc?'100%':'0';
+  const action=document.getElementById('dp-action');
+  if(disc){
+    action.innerHTML=`<button class="btn sm primary" style="width:100%" onclick="enterObj('${obj.id}')">▶ ENTER ${isCity?'CITY':'POI'}</button>`;
+  } else {
+    action.innerHTML=`<div style="font-size:10px;color:var(--t4);text-align:center;padding:2px 0">Discover this POI to enter</div>`;
+  }
+  document.getElementById('details-popup').style.display='block';
+}
+
+function closePopup(){
+  document.getElementById('details-popup').style.display='none';
+  selObj=null; drawMap();
+}
+
+function enterObj(id){
+  const city=GS?.world.cities.find(c=>c.id===id);
+  const poi=GS?.world.pois.find(p=>p.id===id);
+  closePopup();
+  if(city) openSidePanel('city', city.name, `CITY · ${(city.size||'medium').toUpperCase()}${city.isHQ?' · HEADQUARTERS':''}`);
+  else if(poi) openSidePanel('poi', poi.name, `${poi.type.toUpperCase()} · ${poi.size.toUpperCase()}`);
+}
+
+// ── MAP ───────────────────────────────────────────────────────────────────────
+let mc,mx,cam={ox:0,oy:0,zoom:1,ts:6},drag=null;
+const ets=()=>cam.ts*cam.zoom;
+function w2s(wx,wy){const ts=ets();return[wx*ts-cam.ox,wy*ts-cam.oy];}
+function s2w(sx,sy){const ts=ets();return[(sx+cam.ox)/ts,(sy+cam.oy)/ts];}
+
+function initMap(){
+  const wrap=document.getElementById('map-wrap');
+  mc=document.getElementById('map-canvas');mx=mc.getContext('2d');
+  sizeCan();window.addEventListener('resize',()=>{sizeCan();drawMap();});
+  const MAP=GS.world.MAP,ts=Math.min((wrap.clientWidth-40)/MAP,(wrap.clientHeight-40)/MAP);
+  cam.ts=ts;cam.zoom=1;cam.ox=-(wrap.clientWidth-MAP*ts)/2;cam.oy=-(wrap.clientHeight-MAP*ts)/2;
+  wrap.addEventListener('mousedown',mdDown);
+  wrap.addEventListener('mousemove',mdMove);
+  wrap.addEventListener('mouseup',mdUp);
+  wrap.addEventListener('mouseleave',mdUp);
+  wrap.addEventListener('wheel',mdWheel,{passive:false});
+  wrap.addEventListener('click',mdClick);
+  drawMap();
+}
+
+function sizeCan(){
+  const wrap=document.getElementById('map-wrap'),dpr=devicePixelRatio;
+  mc.width=wrap.clientWidth*dpr;mc.height=wrap.clientHeight*dpr;
+  mc.style.width=wrap.clientWidth+'px';mc.style.height=wrap.clientHeight+'px';
+}
+
+function drawMap(){
+  if(!GS||!mx)return;
+  const dpr=devicePixelRatio,lw=mc.width/dpr,lh=mc.height/dpr;
+  const world=GS.world,MAP=world.MAP,ts=ets();
+  mx.save();mx.scale(dpr,dpr);
+  mx.fillStyle='#040609';mx.fillRect(0,0,lw,lh);
+  const x0=Math.max(0,Math.floor(s2w(0,0)[0])),y0=Math.max(0,Math.floor(s2w(0,0)[1]));
+  const x1=Math.min(MAP,Math.ceil(s2w(lw,0)[0])+1),y1=Math.min(MAP,Math.ceil(s2w(0,lh)[1])+1);
+  for(let ty=y0;ty<y1;ty++)for(let tx=x0;tx<x1;tx++){
+    const t=world.tiles[ty]?.[tx];if(!t)continue;
+    const[sx,sy]=w2s(tx,ty);
+    mx.fillStyle=TC[t.type]||'#111';mx.fillRect(sx,sy,ts+.5,ts+.5);
+  }
+  if(ts>22){mx.strokeStyle='rgba(0,0,0,.18)';mx.lineWidth=.5;
+    for(let tx=x0;tx<x1;tx++){const[sx]=w2s(tx,0);mx.beginPath();mx.moveTo(sx,0);mx.lineTo(sx,lh);mx.stroke();}
+    for(let ty=y0;ty<y1;ty++){const[,sy]=w2s(0,ty);mx.beginPath();mx.moveTo(0,sy);mx.lineTo(lw,sy);mx.stroke();}}
+  // Roads
+  mx.setLineDash([ts*.45,ts*.3]);mx.strokeStyle='rgba(100,80,30,.25)';mx.lineWidth=Math.max(1,ts*.16);
+  world.cities.forEach((c,i)=>world.cities.slice(i+1).forEach(d=>{
+    const[ax,ay]=w2s(c.x+.5,c.y+.5),[bx,by]=w2s(d.x+.5,d.y+.5);
+    mx.beginPath();mx.moveTo(ax,ay);mx.lineTo(bx,by);mx.stroke();
+  }));
+  mx.setLineDash([]);
+  // POIs
+  world.pois.forEach(poi=>{
+    const[sx,sy]=w2s(poi.x+.5,poi.y+.5),pr=Math.max(4,ts*.8),sel=selObj?.id===poi.id;
+    mx.save();mx.translate(sx,sy);mx.rotate(Math.PI/4);
+    if(poi.discovered){
+      mx.fillStyle=sel?'#f0b820':'#c8900e';mx.shadowColor=sel?'#f0b820':'#a07008';mx.shadowBlur=sel?18:6;
+      mx.fillRect(-pr*.6,-pr*.6,pr*1.2,pr*1.2);
+      mx.fillStyle='#05070d';mx.shadowBlur=0;mx.fillRect(-pr*.3,-pr*.3,pr*.6,pr*.6);
+    } else {
+      mx.strokeStyle=sel?'#4060a0':'#202c40';mx.lineWidth=Math.max(.8,ts*.08);mx.shadowBlur=0;
+      mx.strokeRect(-pr*.55,-pr*.55,pr*1.1,pr*1.1);
+    }
+    mx.restore();
+    if(ts>5&&poi.discovered){const fs=Math.min(11,Math.max(7,ts*.8));mx.font=`${fs}px 'Crimson Pro',serif`;mx.fillStyle=sel?'#f0c840':'rgba(170,120,14,.85)';mx.textAlign='center';mx.textBaseline='top';mx.shadowColor='rgba(0,0,0,.8)';mx.shadowBlur=3;mx.fillText(poi.name,sx,sy+pr*1.15+2);mx.shadowBlur=0;}
+    if(ts>9&&!poi.discovered){mx.fillStyle='rgba(60,80,120,.5)';mx.font=`${Math.max(8,pr*.9)}px monospace`;mx.textAlign='center';mx.textBaseline='middle';mx.fillText('?',sx,sy);}
+  });
+  // Cities
+  world.cities.forEach(city=>{
+    const[sx,sy]=w2s(city.x+.5,city.y+.5),cr=Math.max(5,ts*.95),sel=selObj?.id===city.id;
+    if(city.isHQ){
+      mx.beginPath();mx.arc(sx,sy,cr*2.6,0,Math.PI*2);
+      mx.strokeStyle=sel?'rgba(200,160,20,.3)':'rgba(180,130,10,.14)';mx.lineWidth=cr*.5;mx.stroke();
+    }
+    mx.beginPath();mx.arc(sx,sy,cr,0,Math.PI*2);
+    mx.fillStyle=sel?'#5a9ed8':'#3a7eba';mx.shadowColor='#1a5080';mx.shadowBlur=sel?14:7;mx.fill();mx.shadowBlur=0;
+    mx.beginPath();mx.arc(sx,sy,cr*.4,0,Math.PI*2);mx.fillStyle='#04060c';mx.fill();
+    if(ts>4){
+      const fs=Math.min(13,Math.max(8,ts*.95));
+      mx.font=`600 ${fs}px 'Cinzel',serif`;mx.fillStyle='#6aaedc';
+      mx.textAlign='center';mx.textBaseline='top';
+      mx.shadowColor='rgba(0,0,0,.9)';mx.shadowBlur=4;
+      mx.fillText(city.name,sx,sy+cr*1.38+1);
+      if(city.isHQ){mx.font=`${Math.max(6,fs*.7)}px 'Share Tech Mono',monospace`;mx.fillStyle='#c8900e';mx.fillText('[HQ]',sx,sy+cr*1.38+fs+2);}
+      mx.shadowBlur=0;
+    }
+  });
+  mx.restore();
+}
+
+function mdDown(e){if(e.button!==0)return;drag={sx:e.clientX,sy:e.clientY,ox:cam.ox,oy:cam.oy,moved:false};e.currentTarget.classList.add('dragging');}
+function mdMove(e){if(!drag)return;const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.moved=true;if(drag.moved){cam.ox=drag.ox-dx;cam.oy=drag.oy-dy;drawMap();}}
+function mdUp(e){if(drag)e.currentTarget.classList.remove('dragging');drag=null;}
+function mdWheel(e){
+  e.preventDefault();
+  const rect=e.currentTarget.getBoundingClientRect(),sx=e.clientX-rect.left,sy=e.clientY-rect.top;
+  const[wx,wy]=s2w(sx,sy);cam.zoom=Math.max(.2,Math.min(16,cam.zoom*(e.deltaY>0?.82:1.22)));
+  const ts=ets();cam.ox=wx*ts-sx;cam.oy=wy*ts-sy;drawMap();
+}
+function mdClick(e){
+  if(drag?.moved)return;
+  const rect=e.currentTarget.getBoundingClientRect(),sx=e.clientX-rect.left,sy=e.clientY-rect.top,ts=ets();
+  let hit=null;
+  GS.world.pois.forEach(poi=>{const[px,py]=w2s(poi.x+.5,poi.y+.5);if(Math.hypot(sx-px,sy-py)<Math.max(7,ts*1.2))hit={_type:'poi',...poi};});
+  GS.world.cities.forEach(city=>{const[cx,cy]=w2s(city.x+.5,city.y+.5);if(Math.hypot(sx-cx,sy-cy)<Math.max(8,ts*1.4))hit={_type:'city',...city};});
+  if(hit){selObj=hit;showDetailsPopup(hit);}else{selObj=null;closePopup();}
+  drawMap();
+}
+
+// ── MARKET ────────────────────────────────────────────────────────────────────
+let purList=[];
+function renderMarket(cat){
+  const items=cat==='perm'?ITEMS_PERM:cat==='rot'?ITEMS_ROT:ITEMS_RARE;
+  document.getElementById('mkt-items').innerHTML=items.map((it,i)=>`
+    <div class="item-row ${purList.find(p=>p._cat===cat&&p._idx===i)?'staged':''}" onclick="addToPur(${i},'${cat}')">
+      <div class="item-row-name">${it.n}</div>
+      <div class="item-row-tags">${it.t}</div>
+      <div class="item-row-gold">◈ ${it.g[0]}–${it.g[1]}</div>
+      <div class="item-row-size">sz ${it.s}</div>
+    </div>`).join('');
+}
+function mktCat(cat,btn){document.querySelectorAll('.market-cat').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMarket(cat);}
+function addToPur(idx,cat){const items=cat==='perm'?ITEMS_PERM:cat==='rot'?ITEMS_ROT:ITEMS_RARE;purList.push({...items[idx],_cat:cat,_idx:idx});renderPurBox();}
+function remFromPur(i){purList.splice(i,1);renderPurBox();}
+function clearPurchase(){purList=[];renderPurBox();}
+function renderPurBox(){
+  const el=document.getElementById('pur-staged');
+  if(!purList.length){el.innerHTML='<div class="purchase-staged-empty">Stage items above to purchase them.</div>';
+    document.getElementById('pur-total').textContent='0 – 0 gold';
+    document.getElementById('pur-tax').textContent='Tax (10%): max 0 gold';return;}
+  el.innerHTML=purList.map((it,i)=>`<div class="purchase-staged-item">
+    <span class="psi-name">${it.n}</span>
+    <span class="psi-gold">◈ ${it.g[0]}–${it.g[1]}</span>
+    <span class="psi-remove" onclick="remFromPur(${i})">✕</span>
+  </div>`).join('');
+  const mn=purList.reduce((s,i)=>s+i.g[0],0),mx2=purList.reduce((s,i)=>s+i.g[1],0);
+  document.getElementById('pur-total').textContent=`${mn} – ${mx2} gold`;
+  document.getElementById('pur-tax').textContent=`Tax (10%): max ${Math.ceil(mx2*1.1)} gold`;
+}
+function confirmPurchase(){if(!purList.length)return;showToast('Purchase confirmed (UI mock).');clearPurchase();}
+
+// ── TAVERN ────────────────────────────────────────────────────────────────────
+function renderTavern(){
+  document.getElementById('tavern-list').innerHTML=MOCK_RECRUITS.map(r=>`
+    <div class="recruit-card" onclick="showToast('Hire ${r.name} — not yet implemented.')">
+      <div class="recruit-portrait"><span>☉</span></div>
+      <div class="recruit-info">
+        <div class="recruit-name">${r.name}</div>
+        <div class="recruit-level">Level ${r.level} · ${r.race}</div>
+        <div class="recruit-traits">${r.traits.map(t=>`<span class="trait">${t}</span>`).join('')}</div>
+        <div class="recruit-cost">◈ ${r.cost} gold</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── ROSTER ────────────────────────────────────────────────────────────────────
+function renderRoster(){
+  const badge={Available:'badge-ok',Deployed:'badge-blue',Wounded:'badge-warn',Incapacitated:'badge-bad'};
+  document.getElementById('roster-body').innerHTML=MOCK_ROSTER.map(r=>`
+    <tr onclick="showToast('${r.name} — character detail not yet implemented.')">
+      <td style="color:var(--t1);font-family:var(--fb)">${r.name}</td>
+      <td>${r.level}</td>
+      <td><span class="badge ${badge[r.state]||'badge-ok'}">${r.state}</span></td>
+      <td style="color:var(--t3);font-size:10px">${r.loc}</td>
+      <td>
+        <span style="color:${r.loyalty>15?'var(--okb)':r.loyalty>7?'var(--warnb)':'var(--badb)'}">${r.loyalty}</span>
+        <span class="loyalty-bar"><span class="loyalty-fill" style="width:${(r.loyalty/30*100).toFixed(0)}%"></span></span>
+      </td>
+    </tr>`).join('');
+}
+
+// ── STOREROOM ─────────────────────────────────────────────────────────────────
+function renderInventory(){
+  document.getElementById('inv-list').innerHTML=MOCK_INV.map(it=>`
+    <div class="inv-row">
+      <span class="inv-row-name">${it.n}</span>
+      <span class="inv-row-qty">×${it.qty}</span>
+      <span class="inv-row-gold">◈ ${it.g[0]}–${it.g[1]}</span>
+      <span class="inv-row-action" onclick="showToast('Move to For Sale — not yet implemented.')">→ Sale</span>
+    </div>`).join('');
+}
+function confirmSale(){showToast('Sale confirmed (UI mock).');}
+
+// ── LEDGER ────────────────────────────────────────────────────────────────────
+function renderLedger(){
+  document.getElementById('ledger-list').innerHTML=MOCK_LEDGER.map(row=>`
+    <div class="ledger-row">
+      <span class="ledger-turn">T${row.turn}</span>
+      <span class="ledger-desc">${row.desc}</span>
+      <span class="ledger-amount ${row.amt>0?'ledger-in':'ledger-out'}">${row.amt>0?'+':''}${row.amt}</span>
+      <span class="ledger-balance">◈ ${row.bal}</span>
+    </div>`).join('');
+}
+
+// ── GROUPS ────────────────────────────────────────────────────────────────────
+function renderGroups(){
+  document.getElementById('group-list').innerHTML=MOCK_GROUPS.map((g,gi)=>`
+    <div class="group-card">
+      <div class="group-card-hd">
+        <div style="flex:1">
+          <div class="group-card-name">${g.name}</div>
+          <div class="group-card-role">${g.role}</div>
+        </div>
+        <div class="group-card-loc">${g.loc}</div>
+      </div>
+      <div class="group-card-body">
+        <div class="group-members-row">
+          ${g.members.map(m=>`<div class="member-token"><span>${m[0]}</span></div>`).join('')}
+          ${Array(9-g.members.length).fill(0).map(()=>'<div class="member-token empty"><span>+</span></div>').join('')}
+        </div>
+        <div class="group-task-label">Current task</div>
+        <div class="group-task">${g.task}</div>
+      </div>
+      <div class="group-card-ft">
+        <button class="btn xs" onclick="showToast('Group detail — not yet implemented.')">Details</button>
+        <button class="btn xs" onclick="showToast('Schedule — not yet implemented.')">Schedule</button>
+        <button class="btn xs" onclick="showToast('Task list — not yet implemented.')">Tasks</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── STAFF SLOTS ───────────────────────────────────────────────────────────────
+function renderStaffSlots(){
+  ['rumors','trade','train','heal'].forEach(id=>{
+    document.getElementById('staff-'+id).innerHTML=
+      Array(4).fill(0).map((_,i)=>`<div class="staff-slot ${i===0?'filled':''}" onclick="showToast('Staff assignment — not yet implemented.')"><span>${i===0?'☉':''}</span></div>`).join('');
+  });
+}
+
+// ── POI ZONE GRAPH ────────────────────────────────────────────────────────────
+function drawZoneGraph(){
+  const wrap=document.getElementById('zone-canvas-wrap');
+  const canvas=document.getElementById('zone-canvas');
+  const dpr=devicePixelRatio;
+  canvas.width=wrap.clientWidth*dpr;canvas.height=wrap.clientHeight*dpr;
+  canvas.style.width=wrap.clientWidth+'px';canvas.style.height=wrap.clientHeight+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.save();ctx.scale(dpr,dpr);
+  const W=wrap.clientWidth,H=wrap.clientHeight;
+  ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);
+  // Edges
+  MOCK_EDGES.forEach(([a,b])=>{
+    const za=MOCK_POI_ZONES.find(z=>z.id===a),zb=MOCK_POI_ZONES.find(z=>z.id===b);
+    if(!za||!zb)return;
+    ctx.beginPath();ctx.moveTo(za.x,za.y);ctx.lineTo(zb.x,zb.y);
+    ctx.strokeStyle='#1a2535';ctx.lineWidth=2;ctx.stroke();
+  });
+  // Nodes
+  MOCK_POI_ZONES.forEach(z=>{
+    const r=26,scouted=z.state==='Scouted';
+    ctx.beginPath();ctx.arc(z.x,z.y,r,0,Math.PI*2);
+    ctx.fillStyle=scouted?'#0e1525':'#060810';
+    ctx.shadowColor=scouted?'#2a4070':'transparent';ctx.shadowBlur=scouted?12:0;
+    ctx.fill();ctx.shadowBlur=0;
+    ctx.strokeStyle=scouted?'#2e4a80':'#1a2535';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.font=`10px 'Crimson Pro',serif`;
+    ctx.fillStyle=scouted?'#8a9ab0':'#2e3a50';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(scouted?z.n:'?',z.x,z.y);
+  });
+  ctx.restore();
+  // Hit detection
+  canvas.onclick=e=>{
+    const rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const hit=MOCK_POI_ZONES.find(z=>Math.hypot(mx-z.x,my-z.y)<28);
+    if(hit)renderZoneDetail(hit);
+  };
+}
+
+function renderZoneDetail(zone){
+  const el=document.getElementById('zone-detail');
+  if(zone.state==='Unknown'){
+    el.innerHTML=`<div style="font-size:10px;color:var(--t4);padding:16px 0;text-align:center;font-style:italic">Zone unexplored — enter to scout.</div>`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="sec" style="margin-bottom:14px">
+      <div class="sec-title">${zone.n}</div>
+      <div class="zone-cond"><span class="zone-cond-label">Light</span>
+        <div class="prog"><div class="prog-fill prog-gold" style="width:70%"></div></div>
+        <span style="font-size:9px;color:var(--t4)">70%</span></div>
+    </div>
+    <div class="sec" style="margin-bottom:14px">
+      <div class="sec-title">Located Objects</div>
+      <div class="zone-obj-list">
+        <div class="zone-obj-row"><div class="zone-obj-icon">◼</div><span class="zone-obj-name">Stone Formation</span><span class="zone-obj-meta">sz 2</span></div>
+        <div class="zone-obj-row"><div class="zone-obj-icon">◼</div><span class="zone-obj-name">Iron Ore Deposit</span><span class="zone-obj-meta">sz 3</span></div>
+        <div class="zone-obj-row"><div class="zone-obj-icon rhombus"><span>☉</span></div><span class="zone-obj-name">Seren Vale</span><span class="zone-obj-meta">yours</span></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Actions — Seren Vale</div>
+      <div class="action-list">
+        <div class="action-row"><span class="action-name">Scout Zone</span><span class="action-cost">5 AP</span></div>
+        <div class="action-row"><span class="action-name">Rest</span><span class="action-cost">46 AP</span></div>
+        <div class="action-row"><span class="action-name">Eat</span><span class="action-cost">5 AP</span></div>
+        <div class="action-row"><span class="action-name">Hide</span><span class="action-cost">5 AP</span></div>
+        <div class="action-row"><span class="action-name">Move to adjacent zone</span><span class="action-cost">→</span></div>
+      </div>
+    </div>`;
+  el.querySelectorAll('.action-row').forEach(row=>{
+    row.addEventListener('click',()=>showToast('"'+row.querySelector('.action-name').textContent+'" — not yet implemented.'));
+  });
+}
+
+// ── DEV SYSTEM ────────────────────────────────────────────────────────────────
+const DEV=(()=>{
+  const IS_DEV=location.search.includes('dev');
+  let pc=0,fc=0;
+  function init(){if(!IS_DEV)return;document.getElementById('dev-badge').style.display='block';const o=window.endTurn;window.endTurn=function(){o();DEV.validate();};}
+  function log(m,lv='info'){const el=document.getElementById('dev-log');if(!el)return;const d=document.createElement('div');d.className='dle '+lv;d.textContent={pass:'✓',fail:'✗',warn:'⚠',info:'·',head:'▸'}[lv]+' '+m;el.appendChild(d);el.scrollTop=el.scrollHeight;if(lv==='pass')pc++;if(lv==='fail')fc++;}
+  function clear(){const el=document.getElementById('dev-log');if(el)el.innerHTML='';pc=0;fc=0;}
+  function toggle(){const p=document.getElementById('dev-panel'),b=document.getElementById('dev-badge');p.classList.toggle('open');b.textContent=p.classList.contains('open')?'DEV ▼':'DEV ▲';}
+  const RULES=[
+    {id:'GS-001',desc:'GameState has required fields',check:gs=>{if(!gs)return 'null';const m=['turn','world','organizations','playerOrgId'].filter(k=>!(k in gs));return m.length?'Missing: '+m.join(', '):true;}},
+    {id:'GS-002',desc:'turn >= 1',check:gs=>gs.turn>=1||'turn='+gs.turn},
+    {id:'GS-003',desc:'playerOrgId references existing org',check:gs=>gs.organizations.some(o=>o.id===gs.playerOrgId)||'not found'},
+    {id:'WO-001',desc:'Exactly 3 cities',check:gs=>gs.world.cities.length===3||'got '+gs.world.cities.length},
+    {id:'WO-002',desc:'Exactly one HQ city',check:gs=>{const n=gs.world.cities.filter(c=>c.isHQ).length;return n===1||'HQ count='+n;}},
+    {id:'WO-003',desc:'Map size 64–256',check:gs=>(gs.world.MAP>=64&&gs.world.MAP<=256)||'MAP='+gs.world.MAP},
+    {id:'WO-004',desc:'No POI despawnTimer < 0',check:gs=>{const b=gs.world.pois.filter(p=>p.despawnTimer<0);return b.length===0||b.length+' negative timers';}},
+    {id:'WO-005',desc:'POI zone count 3–20',check:gs=>{const b=gs.world.pois.filter(p=>p.zones<3||p.zones>20);return b.length===0||b.length+' out of range';}},
+    {id:'OR-001',desc:'Org gold >= 0',check:gs=>{const o=gs.organizations.find(o=>o.id===gs.playerOrgId);return o.gold>=0||'gold='+o.gold;}},
+    {id:'OR-002',desc:'Org inventory has all categories',check:gs=>{const inv=gs.organizations.find(o=>o.id===gs.playerOrgId).inventory;const m=['food','equipment','weapons','misc','forSale'].filter(k=>!Array.isArray(inv[k]));return m.length===0||'Missing: '+m.join(', ');}},
+  ];
+  function validate(){clear();if(!GS){log('No game state.','warn');return;}log('Validate — Turn '+GS.turn,'head');pc=0;fc=0;RULES.forEach(rule=>{let r;try{r=rule.check(GS);}catch(e){r='ERROR: '+e.message;}log('['+rule.id+'] '+rule.desc,r===true?'pass':'fail');if(r!==true)log('  '+r,'warn');});log('─ '+pc+' passed '+fc+' failed ─','head');if(!document.getElementById('dev-panel').classList.contains('open'))toggle();}
+  function scenario(name){log('Scenario: '+name,'head');
+    if(name==='world_gen'){startGame();validate();}
+    else if(name==='corrupt'){if(!GS){log('Start a game first.','warn');return;}pOrg().gold=-500;GS.world.pois[0].despawnTimer=-10;GS.world.cities.push({id:'c99',name:'Extra',x:5,y:5});log('3 violations injected','warn');validate();}
+    if(!document.getElementById('dev-panel').classList.contains('open'))toggle();}
+  const inj={
+    rich:()=>{if(!GS)return;pOrg().gold=99999;updateUI();log('gold=99999','info');validate();},
+    allDisc:()=>{if(!GS)return;GS.world.pois.forEach(p=>p.discovered=true);drawMap();log('All POIs discovered','info');},
+    negGold:()=>{if(!GS)return;pOrg().gold=-1000;updateUI();log('gold=-1000','warn');validate();},
+    badPOI:()=>{if(!GS)return;GS.world.pois[0].despawnTimer=-1;log('pois[0].despawnTimer=-1','warn');validate();},
+  };
+  document.addEventListener('DOMContentLoaded',init);
+  return{validate,scenario,clear,toggle,log,inj,RULES,IS_DEV};
+})();
+</script>
+</body>
+</html>

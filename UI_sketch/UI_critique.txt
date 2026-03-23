@@ -1,0 +1,17 @@
+What the research says — distilled
+The highest-ranked principles across all sources:
+1. Visual hierarchy is the most cited failure point. Everything in the current UI is the same visual weight — same size text, same border style, same low-contrast palette. The player's eye has no natural path. Critical information (turn, gold) reads identically to tertiary labels. The rule: at any moment the player must be able to answer "what is the most important thing on this screen right now" in under one second.
+
+2. Information density must match context. The current City Layout dumps all seven panels into view at once via a left nav, even though the player almost never needs all seven simultaneously. The Crusader Kings / Paradox approach — which is the gold standard for this genre — is to surface the map at all times and float panels on top of it contextually. Nothing should replace the world map entirely unless absolutely necessary.
+
+3. The map is the game. For a strategy game the world map is not just a view — it is the primary decision surface. Every secondary UI should be a popup, a panel anchored to a corner, or a floating window — never a full-screen replacement that hides the map. The current design replaces the map with City Layout, which kills immersion and spatial orientation.
+
+4. Popups should be small, anchored, and dismissible. The current details popup works reasonably well but the Enter City action should not require navigating away from the map. Ideally you enter the city in a side panel that slides in over the map's edge, keeping the world visible.
+
+5. The toolbar has wrong priority order. "End Turn" is the single most important action in a turn-based game. It should be large, unmissable, visually dominant. Currently it's a small button in a row of similarly sized buttons, no different from "Save".
+
+6. Consistent encoding of information. Currently states like "Wounded", "Deployed", "Available" use colour badges but everything else is monochrome text. Colour, icon, and label should all encode the same thing simultaneously (double-encoding rule).
+
+7. Spatial anchoring — fixed zones. The best strategy UIs (Total War, CK3) put critical persistent info (resources, turn) in the top bar; context-sensitive selection info in a bottom-left or bottom panel; the map action/navigation in the top-right. The current toolbar mixes navigation actions with game state information without visual separation.
+
+8. The aesthetic needs a committed direction. Right now it's generically dark with gold accents — competent but forgettable. For a medieval mercenary guild game the reference aesthetic should be closer to aged parchment-meets-iron: rough textures, ink-stained borders, candlelit warmth, with UI frames that feel like they were fabricated from the same world the characters inhabit (skeuomorphic-adjacent but restrained).

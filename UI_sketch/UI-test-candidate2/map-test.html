@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Map Test</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#04060c; }
+canvas { display:block; width:100%; height:100%; cursor:grab; }
+canvas.drag { cursor:grabbing; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+const DPR    = devicePixelRatio || 1;
+
+// ── Resize ──────────────────────────────────────────────────────────────
+function resize() {
+  canvas.width  = window.innerWidth  * DPR;
+  canvas.height = window.innerHeight * DPR;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+// ── Camera ──────────────────────────────────────────────────────────────
+// tile size in pixels (base, before zoom)
+const BASE_TS = 14;
+let cam = { x: 0, y: 0, zoom: 1 };  // x,y = world offset in tiles
+function ts() { return BASE_TS * cam.zoom; }
+function w2s(wx, wy) {
+  return [
+    (wx - cam.x) * ts(),
+    (wy - cam.y) * ts()
+  ];
+}
+
+// ── World data ──────────────────────────────────────────────────────────
+const MAP = 64;
+
+// Simple deterministic noise for terrain
+function noise(x, y, seed) {
+  return (Math.sin(x * 0.11 + seed * 0.017) * 0.5
+        + Math.cos(y * 0.09 + seed * 0.013) * 0.4
+        + Math.sin((x + y) * 0.07)          * 0.3
+        + Math.cos((x - y) * 0.06)          * 0.25 + 1.45) / 2.9;
+}
+
+const SEED = 42;
+const TILE_COLORS = {
+  water:     '#071828',
+  shallows:  '#0a1e2e',
+  plains:    '#0d1a0e',
+  forest:    '#071309',
+  hills:     '#111418',
+};
+
+// Generate terrain
+const tiles = [];
+for (let y = 0; y < MAP; y++) {
+  tiles[y] = [];
+  for (let x = 0; x < MAP; x++) {
+    const n = noise(x, y, SEED);
+    let type;
+    if      (n < .22) type = 'water';
+    else if (n < .30) type = 'shallows';
+    else if (n < .48) type = 'plains';
+    else if (n < .65) type = 'forest';
+    else              type = 'hills';
+    tiles[y][x] = type;
+  }
+}
+
+// Cities
+const cities = [
+  { name:'Valdenmoor', x:11, y:10, hq:true  },
+  { name:'Ashford',    x:50, y: 8, hq:false },
+  { name:'Irongate',   x:30, y:52, hq:false },
+];
+
+// POIs  — size: 'small' | 'medium' | 'large',  disc: discovered
+const pois = [
+  { name:'Ironveil Hollow',   x:20, y:18, size:'medium', disc:true  },
+  { name:'Grey Barrow',       x:40, y:14, size:'small',  disc:true  },
+  { name:'Embervault',        x:15, y:35, size:'large',  disc:true  },
+  { name:'The Sunken Keep',   x:44, y:30, size:'medium', disc:true  },
+  { name:'Coldfen',           x:34, y:22, size:'small',  disc:true  },
+  { name:'Duskfall Ridge',    x:54, y:42, size:'large',  disc:true  },
+  { name:'Unknown Site',      x:26, y:44, size:'medium', disc:false },
+  { name:'Unknown Site',      x:48, y:20, size:'small',  disc:false },
+  { name:'Unknown Site',      x:10, y:50, size:'large',  disc:false },
+];
+
+// ── Image loading ────────────────────────────────────────────────────────
+// Loads images from ./images/ — graceful fallback if missing
+const IMG = {};
+function loadImg(key, file) {
+  const img = new Image();
+  img.onload  = () => { IMG[key] = img; draw(); };
+  img.onerror = () => { IMG[key] = null; };
+  img.src = './images/' + file;
+}
+loadImg('city',       'map-city-large.png');
+loadImg('poi-sm',     'map-poi-small-disc.png');
+loadImg('poi-md',     'map-poi-medium-disc.png');
+loadImg('poi-lg',     'map-poi-large-disc.png');
+loadImg('poi-undisc', 'map-poi-undisc.png');
+
+function img(key) { return IMG[key] || null; }
+
+// ── Drawing ──────────────────────────────────────────────────────────────
+function draw() {
+  const W = canvas.width  / DPR;
+  const H = canvas.height / DPR;
+  const S = ts();
+
+  ctx.save();
+  ctx.scale(DPR, DPR);
+  ctx.fillStyle = '#04060c';
+  ctx.fillRect(0, 0, W, H);
+
+  // Visible tile range
+  const x0 = Math.max(0,   Math.floor(cam.x));
+  const y0 = Math.max(0,   Math.floor(cam.y));
+  const x1 = Math.min(MAP, Math.ceil(cam.x + W / S) + 1);
+  const y1 = Math.min(MAP, Math.ceil(cam.y + H / S) + 1);
+
+  // Terrain
+  for (let ty = y0; ty < y1; ty++) {
+    for (let tx = x0; tx < x1; tx++) {
+      const [sx, sy] = w2s(tx, ty);
+      ctx.fillStyle = TILE_COLORS[tiles[ty][tx]] || '#111';
+      ctx.fillRect(sx, sy, S + 0.5, S + 0.5);
+    }
+  }
+
+  // Subtle grid lines at higher zoom
+  if (S > 20) {
+    ctx.strokeStyle = 'rgba(255,255,255,.04)';
+    ctx.lineWidth = 0.5;
+    for (let tx = x0; tx <= x1; tx++) {
+      const [sx] = w2s(tx, 0);
+      ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, H); ctx.stroke();
+    }
+    for (let ty = y0; ty <= y1; ty++) {
+      const [, sy] = w2s(0, ty);
+      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+    }
+  }
+
+  // Roads between cities
+  ctx.save();
+  ctx.setLineDash([S * .4, S * .28]);
+  ctx.strokeStyle = 'rgba(130,100,40,.3)';
+  ctx.lineWidth = Math.max(1, S * .16);
+  for (let i = 0; i < cities.length; i++) {
+    for (let j = i + 1; j < cities.length; j++) {
+      const [ax, ay] = w2s(cities[i].x + .5, cities[i].y + .5);
+      const [bx, by] = w2s(cities[j].x + .5, cities[j].y + .5);
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // POIs — fixed-size icons, cull with pixel margin
+  for (const poi of pois) {
+    const [sx, sy] = w2s(poi.x + .5, poi.y + .5);
+    if (sx < -80 || sx > W+80 || sy < -80 || sy > H+80) continue;
+    drawPOI(sx, sy, poi);
+  }
+
+  // Cities — fixed-size icons, cull with pixel margin
+  for (const city of cities) {
+    const [sx, sy] = w2s(city.x + .5, city.y + .5);
+    if (sx < -120 || sx > W+120 || sy < -120 || sy > H+120) continue;
+    drawCity(sx, sy, city);
+  }
+
+  // Vignette
+  const vg = ctx.createRadialGradient(W/2, H/2, H*.38, W/2, H/2, H*.78);
+  vg.addColorStop(0, 'rgba(4,6,12,0)');
+  vg.addColorStop(1, 'rgba(4,6,12,.6)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.restore();
+}
+
+// Fixed screen-space sizes (pixels, independent of zoom)
+const CITY_R = 38;   // radius of city circle
+const POI_R  = 18;   // radius of POI circle
+
+function drawCity(sx, sy, city) {
+  const cr = CITY_R;
+
+  // HQ outer glow ring
+  if (city.hq) {
+    ctx.beginPath();
+    ctx.arc(sx, sy, cr + 14, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(180,130,10,.25)';
+    ctx.lineWidth   = 8;
+    ctx.stroke();
+    // second thinner ring
+    ctx.beginPath();
+    ctx.arc(sx, sy, cr + 22, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(180,130,10,.10)';
+    ctx.lineWidth   = 4;
+    ctx.stroke();
+  }
+
+  // Dark backing circle
+  ctx.beginPath(); ctx.arc(sx, sy, cr + 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(4,6,14,.85)'; ctx.fill();
+
+  // Image clipped to circle
+  const cityImg = img('city');
+  ctx.save();
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2); ctx.clip();
+  if (cityImg) {
+    ctx.drawImage(cityImg, sx - cr, sy - cr, cr * 2, cr * 2);
+    ctx.fillStyle = 'rgba(0,0,0,.22)';
+    ctx.fillRect(sx - cr, sy - cr, cr * 2, cr * 2);
+  } else {
+    ctx.fillStyle = '#3a80c0'; ctx.fill();
+  }
+  ctx.restore();
+
+  // Circle border
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2);
+  ctx.strokeStyle = city.hq ? '#c8900e' : '#4a70a0';
+  ctx.lineWidth   = city.hq ? 2.5 : 1.8;
+  ctx.stroke();
+
+  // Label — always visible, fixed size
+  ctx.font = `600 12px Palatino,serif`;
+  ctx.fillStyle = '#8ac4e0';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.shadowColor = 'rgba(0,0,0,.98)'; ctx.shadowBlur = 5;
+  ctx.fillText(city.name, sx, sy + cr + 5);
+  if (city.hq) {
+    ctx.font = `300 10px monospace`;
+    ctx.fillStyle = '#c89010';
+    ctx.fillText('[HQ]', sx, sy + cr + 19);
+  }
+  ctx.shadowBlur = 0;
+}
+
+function drawPOI(sx, sy, poi) {
+  const cr = POI_R;   // circle radius
+
+  const imgKey = poi.disc
+    ? (poi.size === 'small' ? 'poi-sm' : poi.size === 'large' ? 'poi-lg' : 'poi-md')
+    : 'poi-undisc';
+  const poiImg = img(imgKey);
+
+  // Dark backing circle
+  ctx.beginPath(); ctx.arc(sx, sy, cr + 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(4,6,14,.85)'; ctx.fill();
+
+  // Image clipped to circle
+  ctx.save();
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2); ctx.clip();
+  if (poiImg) {
+    ctx.globalAlpha = poi.disc ? 1 : 0.55;
+    ctx.drawImage(poiImg, sx - cr, sy - cr, cr * 2, cr * 2);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = poi.disc ? 'rgba(0,0,0,.2)' : 'rgba(4,6,20,.45)';
+    ctx.fillRect(sx - cr, sy - cr, cr * 2, cr * 2);
+  } else {
+    const gold = poi.disc
+      ? (poi.size === 'large' ? '#c0900e' : poi.size === 'medium' ? '#a07008' : '#806005')
+      : '#1c2a40';
+    ctx.fillStyle = gold; ctx.fill();
+  }
+  ctx.restore();
+
+  // Circular border
+  ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI * 2);
+  if (!poi.disc) ctx.setLineDash([4, 3]);
+  ctx.strokeStyle = poi.disc ? '#c8900e' : '#2a3a60';
+  ctx.lineWidth   = poi.disc ? 2 : 1.5;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Label — discovered only, always visible at fixed size
+  if (poi.disc) {
+    ctx.font = `400 11px Georgia,serif`;
+    ctx.fillStyle = 'rgba(200,144,14,.9)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,.98)'; ctx.shadowBlur = 4;
+    ctx.fillText(poi.name, sx, sy + cr + 6);
+    ctx.shadowBlur = 0;
+  }
+}
+
+// ── Pan & zoom ──────────────────────────────────────────────────────────
+let drag = null;
+
+canvas.addEventListener('mousedown', e => {
+  drag = { mx:e.clientX, my:e.clientY, cx:cam.x, cy:cam.y };
+  canvas.classList.add('drag');
+});
+window.addEventListener('mousemove', e => {
+  if (!drag) return;
+  const S = ts();
+  cam.x = drag.cx - (e.clientX - drag.mx) / S;
+  cam.y = drag.cy - (e.clientY - drag.my) / S;
+  draw();
+});
+window.addEventListener('mouseup', () => { drag = null; canvas.classList.remove('drag'); });
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const S   = ts();
+  const wx  = cam.x + e.clientX / S;
+  const wy  = cam.y + e.clientY / S;
+  cam.zoom  = Math.max(.25, Math.min(20, cam.zoom * (e.deltaY > 0 ? .84 : 1.19)));
+  cam.x     = wx - e.clientX / ts();
+  cam.y     = wy - e.clientY / ts();
+  draw();
+}, { passive:false });
+
+// Touch support
+let lastTouchDist = null;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    drag = { mx:t.clientX, my:t.clientY, cx:cam.x, cy:cam.y };
+  }
+  if (e.touches.length === 2) {
+    lastTouchDist = Math.hypot(
+      e.touches[1].clientX - e.touches[0].clientX,
+      e.touches[1].clientY - e.touches[0].clientY
+    );
+  }
+}, { passive:true });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && drag) {
+    const t = e.touches[0];
+    const S = ts();
+    cam.x = drag.cx - (t.clientX - drag.mx) / S;
+    cam.y = drag.cy - (t.clientY - drag.my) / S;
+    draw();
+  }
+  if (e.touches.length === 2 && lastTouchDist !== null) {
+    const dist = Math.hypot(
+      e.touches[1].clientX - e.touches[0].clientX,
+      e.touches[1].clientY - e.touches[0].clientY
+    );
+    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    const S  = ts();
+    const wx = cam.x + cx / S, wy = cam.y + cy / S;
+    cam.zoom = Math.max(.25, Math.min(20, cam.zoom * (dist / lastTouchDist)));
+    cam.x    = wx - cx / ts();
+    cam.y    = wy - cy / ts();
+    lastTouchDist = dist;
+    draw();
+  }
+}, { passive:false });
+canvas.addEventListener('touchend', () => { drag = null; lastTouchDist = null; });
+
+// ── Init ────────────────────────────────────────────────────────────────
+// Centre map on start
+cam.x = MAP/2 - window.innerWidth  / (BASE_TS * 2);
+cam.y = MAP/2 - window.innerHeight / (BASE_TS * 2);
+
+resize();
+</script>
+</body>
+</html>
