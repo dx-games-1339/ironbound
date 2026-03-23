@@ -276,7 +276,7 @@ After each discovery pulse, awareness states are re-evaluated for all affected o
 
 Awareness is tracked per faction, not per individual character or group. A faction is a set of groups that share complete knowledge of each other and of all objects they have collectively discovered within a zone. Groups belonging to the same controller (e.g. all player-controlled groups) always form a single faction within a POI and share awareness state instantly.
 
-Animal groups belong to their own factions. It is possible for two factions to occupy the same zone with no awareness of each other — neither appears in the other's Located list. Conflict between factions only becomes possible once at least one group in each faction has located at least one group in the other. In future releases, NPC character groups will also form their own factions and operate under this same system.
+Animal groups belong to their own factions. It is possible for two factions to occupy the same zone with no awareness of each other — neither appears in the other's Located list. Conflict between factions only becomes possible once at least one faction has located at least one group of the other faction. In future releases, NPC character groups will also form their own factions and operate under this same system.
 
 ### 4.5 Zone-wide Actions
 
