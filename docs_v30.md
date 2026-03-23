@@ -129,7 +129,7 @@ In V1 HQ staff tasks are a placeholder and has no real effect or game logic behi
 
 ### 3.3 POI Layout
 
-A view representing the internal structure of a single POI. Accessed by clicking a POI on the Global Map.
+A view representing the internal structure of a single POI.
 
 A POI is composed of **zones** connected by passages. The layout is a node graph: zones are nodes, passages are edges. The graph is rendered on the WebGL canvas with zones as clickable shapes and passages as lines between them. Each zone has a **size** characteristic that determines how large the area is. Size is reflected visually in the POI graph and governs the cost and yield of exploration actions inside the zone (see Section 4.1).
 
