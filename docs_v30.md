@@ -133,6 +133,8 @@ A view representing the internal structure of a single POI.
 
 A POI is composed of **zones** connected by passages. The layout is a node graph: zones are nodes, passages are edges. The graph is rendered on the WebGL canvas with zones as clickable shapes and passages as lines between them. Each zone has a **size** characteristic that determines how large the area is. Size is reflected visually in the POI graph and governs the cost and yield of exploration actions inside the zone (see Section 4.1).
 
+__POI Zones are where most of the gameplay actions happen. Players are supposed to spend the most of their playing time in these layouts.__
+
 **Zone states:**
 
 Zone states are a coarse, zone-level summary visible in the POI graph view. They are distinct from object-level awareness states (Located, Known, Undiscovered), which are finer-grained and only visible inside the Zone Detail Panel. A zone being Scouted does not mean every object inside it has been Located — it means the zone has been entered and observed at least once.
