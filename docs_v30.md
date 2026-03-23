@@ -1183,7 +1183,7 @@ The object type determines which standard actions are available on the object. E
 | Type | Standard actions | Appearance in a "Known" state | Notes |
 |---|---|---|
 | **Rock** | Examine, Gather resources, Move | 95% Unidentified Rock / 5% Unidentified Object | Yields stone or ore. Requires a tool for gathering. |
-| **Tree** | Examine, Cut down, Gather resources | 90% Unidentified Tree / 5% Unidentified Vegetation / 5% Unidentified Object| Yields timber and firewood. Cut down requires sharp tool ≥ 70%. |
+| **Tree** | Examine, Cut down, Gather resources | 90% Unidentified Tree / 5% Unidentified Vegetation / 5% Unidentified Object | Yields timber and firewood. Cut down requires sharp tool ≥ 70%. |
 | **Bush** | Examine, Gather resources, Search, Cut down | 90% Unidentified Bush / 8% Unidentified Vegetation / 2% Unidentified Object | May yield berries, herbs, or concealed objects. |
 | **Plant** | Examine, Gather resources  | 90% Unidentified Plant / 8% Unidentified Vegetation / 2% Unidentified Tree | Yields food, herbs, or other organic material depending on species. |
 | **Pond** | Examine, Use | 100% Unidentified Water Source | May contain fish or hidden objects. |
