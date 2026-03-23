@@ -609,7 +609,7 @@ Each character has the following persistent characteristics. Unless otherwise no
 
 **Level**
 
-A single value ranging from 1 to 10 representing overall experience and capability. Most recruits available for hire start at level 5 or 6. Level does not directly govern other characteristics but serves as a general indicator of a character's competence and is likely to influence action outcomes and event resolution.
+A single value ranging from 1 to 10 representing overall experience and capability. Most recruits available for hire start at level 5 or 6.
 
 **Combat and action characteristics**
 
