@@ -942,9 +942,6 @@ On the first turn of the last day of each month the total upkeep for all charact
 
 The Greedy trait increases a character's base rate by 10%, applied before the level multiplier.
 
-Food and supplies consumed during expeditions are tracked separately from upkeep — a group on a long expedition requires adequate food packed at departure or a resupply group sent after them (see Section 9.2). Running out of food in the field causes hunger to progress through increasingly severe stages, applying mounting penalties to strength, dexterity, perception, and loyalty, and ultimately resulting in death if left unresolved (see Section 5.6). This does not interact with the monthly upkeep payment directly.
-
-
 ### 5.8 Race
 
 Every character has a **race** characteristic assigned at initialisation and fixed for the character's lifetime. Race determines which wound types a character can receive and which other standard status effects apply to them. Characters of the same race share an identical wound table and status effect table.
