@@ -1227,15 +1227,13 @@ This distinction applies consistently across all UI contexts where object or cha
 
 **Character portraits**
 
-Every character in the game has a unique portrait image. Portraits are used wherever that character appears in the UI — in the Zone Detail Panel, the roster, the group panel, and the character detail view. All portrait images are displayed inside a rhombus shape.
+Every character in the game has a unique portrait image. Portraits are used wherever that character appears in the UI — in the Zone Detail Panel, the roster, the group panel, and the character detail view. All portrait images are displayed inside a rhombus (diamond) shape.
 
 Portraits represent the character's appearance and are assigned at initialisation. They do not change over time and are not affected by wounds, equipment, or status effects.
 
 **Object icons**
 
-Each object type has a distinct icon. Objects of the same type but different name or size may use variant icons to help the player distinguish them at a glance — for example, two objects both named "wild plant" may have different icons if one is visually larger or bears berries, enabling the player to prioritise task assignment without reading every entry in detail.
-
-Icon variants are determined at spawn based on the object's size, name, and tags. The full icon set and portrait set are defined in the visual assets specification.
+Each object type has a distinct icon. Objects of the same type but different name or size may use variant icons to help the player distinguish them at a glance. Icon variants are determined at spawn based on the object's size, name, and tags. The full icon set and portrait set are defined in the visual assets specification.
 
 ---
 
