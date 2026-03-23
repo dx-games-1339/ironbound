@@ -1258,12 +1258,6 @@ The guild dissolves (game over) if gold reaches zero and no income is expected w
 
 Food is purchased in the city market and stored at HQ. When a group departs on an expedition, the player allocates food from HQ stock to individual characters.
 
-**During the Rest action**, a character consumes food from their inventory until their hunger charges are reduced to 20 or below in the Hunger stage, eating through Starvation and Famine stages if necessary. Each item consumed reduces charges by its Food (value). Loyalty bonuses from Delicious-tagged food also apply at this point (see Section 5.6.2).
-
-**Between rest turns**, a character's hunger charges accumulate each turn. If hunger progresses to Starvation or Famine and the character performs the Eat action (5 AP), one food item is consumed and its Food value is subtracted from the current stage's charges, potentially reversing hunger progression. Characters with hunger charges above 80 automatically insert a Feed Self sub-goal into the group task list if the group's Allow self-management setting is enabled (see Section 5.6.2 and Section 13.5).
-
-If a character has no food available and hunger is left untreated, it progresses through increasingly severe stages and ultimately causes death (see Section 5.6).
-
 A supply group can be sent to a deployed group's current location to top up their food and swap out equipment.
 
 ### 9.3 Equipment and Weapons
@@ -1272,9 +1266,7 @@ Equipment (armour, tools) and weapons are purchased in the city Market. The Mark
 
 - **Permanent stock** — basic items always available. Inventory does not deplete and does not rotate.
 - **Rotating stock** — higher quality items that appear in limited quantities and are replaced at the start of each new in-game week. Once a rotating stock item is purchased it is gone until the next rotation.
-- **Rare drops** — occasionally a rare or unique item appears; limited to one or two units and does not restock once purchased.
-
-The breadth and quality of rotating stock and rare drops is influenced by the city's **size**. Larger cities offer more rotating stock slots and a higher probability of rare drops appearing. Permanent stock is identical across all city sizes.
+- **Rare** — occasionally a rare or unique item appears; limited to one or two units and does not restock once purchased.
 
 Each item in the Market displays its gold value range (min–max). The purchase mechanic — including the For Purchase staging box, the market tax, and the price roll — is documented in Section 9.5.
 
