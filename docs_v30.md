@@ -301,10 +301,8 @@ Object interactions are divided into four subcategories:
 **Common actions** — applicable to most or all objects:
 - **Take** — pick up the object and place it in a character's inventory. Requires sufficient free inventory capacity. Cannot be applied to objects too large to carry.
 - **Gather resources** — extract usable material from the object (e.g. harvesting from a plant, stripping a carcass). Can be performed without tools but is significantly faster if a compatible tool is present.
-- **Examine** — inspect the object closely to learn more about its properties without interacting with it further.
-- **Conceal** — deliberately make a Located object harder to find. Each completed Conceal execution applies two effects:
-  - **Base visibility reduction** — the object's `visibility` characteristic (the value used to initialise faction visibility for new factions entering the zone) is reduced by 10% of its current value: `object.visibility = ⌊object.visibility × 0.9⌋`. This makes the object harder to discover for any faction that has not yet entered the zone.
-  - **Faction visibility reduction** — for every faction that has already Located the object, their faction visibility toward it is reduced by 10% of its current value: `factionAwareness[factionId][objectId] = ⌊factionAwareness[factionId][objectId] × 0.9⌋`. The faction that performed the Conceal action is exempt from this reduction. After the reduction, awareness states are re-evaluated — a faction whose visibility falls back below the Located threshold (≤90% of `ceiling visibility`) will lose the Located state and revert to Known. Factions that have not yet Located the object are unaffected by this component.
+- **Examine** — planned for future releases. Currently a placeholder.
+- **Conceal** — planned for future releases. Currently a placeholder.
 - **Search for** (Known objects only) — direct the group's effort toward locating a specific Known object. The Search for action produces no passive per-attempt tick — action point investments during progress accumulation apply no visibility increase to any object. On full execution the following steps are applied:
 
   1. **Calculate the character's Discovery Value** using the same formula as Scout Zone (see Section 4.3.3):
@@ -318,13 +316,11 @@ Object interactions are divided into four subcategories:
   All visibility increases are capped at `ceiling visibility`. Awareness states are re-evaluated for all affected objects immediately after the execution and transitions to Known or Located are applied if thresholds are crossed.
 
 **Inventory actions** — operate on items in a character's inventory rather than on zone objects:
-- **Drop** — removes a selected item from a character's inventory and places it into the zone as a new object. The dropped item is immediately Located by the dropping character's faction. Other factions must discover it through normal awareness mechanics.
+- **Drop** — removes a selected item from a character's inventory and places it into the zone as a new object. The dropped item is immediately Located by the dropping character's faction. Other factions must discover it through normal awareness mechanics in order to be able to interact with it.
 
-**Construction actions** — introduce new permanent objects into the zone. Constructed objects enter the Located state for the builder's faction immediately:
-- **Build camp** — establishes a camp structure providing a base for resting, treating injuries, and storing supplies. Requires materials and time.
-- **Build container** — constructs a basic storage box or crate. Can store items, cache supplies, or serve as bait. Additional buildable structures may be defined per game content.
+**Construction actions** —  planned for future releases. Currently a placeholder.
 
-**Object-specific actions** — available only for particular object types, surfaced contextually in the UI:
+**Object-specific actions** — available only for particular object types:
 - Examples: **Open** (chest, door), **Unlock** (locked container), **Cut down** (tree), **Rescue** (incapacitated friendly character), **Attack** (living characters and animals only).
 - Object-specific actions are not enumerated exhaustively here. They appear in the UI only when the relevant object is selected and the action is applicable.
 
