@@ -643,7 +643,7 @@ NPC characters may decide to leave their faction and form a new one (consisting 
 Each character has a **movement speed** characteristic that determines how quickly they can travel. Movement speed affects two contexts:
 
 - **Global map travel** — the number of turns required for a group to travel from its current location to a destination city or POI.
-- **Zone movement** — the number of turns required for a character to move between zones inside a POI.
+- **Zone exploration** — the movement speed slightly increases object awareness gain when performing the Scout zone action.
 
 A group always moves at the speed of its slowest member. If one character in a group has a movement speed penalty from a wound (e.g. a leg wound), the entire group's travel time is calculated using that character's reduced speed. This creates a meaningful trade-off when deciding whether to keep a wounded character in a group or leave them behind.
 
