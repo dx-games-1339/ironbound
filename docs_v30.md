@@ -197,7 +197,7 @@ Each zone has a set of static and dynamic properties that govern how it behaves.
 
 A zone may contain any number of living characters or animals alongside static objects. These are full objects in the zone's object list and follow the same awareness mechanics as everything else — they may be Undiscovered, Known, or Located depending on the faction observing them.
 
-Living characters and animals always belong to a Group. A living character can not exist in a Zone outside of a Group and a single character alwaus belongs to a Group containing that one character. Each Group belongs to a certain faction inside the Zone. Factions have a **disposition** toward every other faction present in the zone. Disposition is not binary. One faction may be hostile toward one faction, neutral toward another, and indifferent to a third simultaneously. The following dispositions are possible:
+Living characters and animals always belong to a Group (see Section 7 Groups). A living character can not exist in a Zone outside of a Group and a single character alwaus belongs to a Group containing that one character. Each Group belongs to a certain faction inside the Zone. Factions have a **disposition** toward every other faction present in the zone. Disposition is not binary. One faction may be hostile toward one faction, neutral toward another, and indifferent to a third simultaneously. The following dispositions are possible:
 
 - **Hostile**
 - **Neutral**
