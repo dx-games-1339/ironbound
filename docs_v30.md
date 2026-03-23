@@ -152,7 +152,7 @@ Zone states are a coarse, zone-level summary visible in the POI graph view. They
 
 **POI metadata** shown in a sidebar:
 - POI type and name
-- Turns remaining before despawn
+- Turns remaining before despawn (turn counter must be colored: more than 60 turns = green, less than 60 more than 12 = yellow, less than 12 turns = red)
 
 ### 3.4 Zone Detail Panel
 
