@@ -215,7 +215,7 @@ A zone may contain a large number of objects — potentially hundreds. Each fact
 
 - **Located** — the faction knows this object exists and knows where it is. Characters can interact with it directly.
 - **Known** — the faction knows this object exists somewhere in the zone but has not pinpointed its location. Interaction is not yet possible.
-- **Undiscovered** — the object is present in the zone but the faction has no knowledge of it. This state exists in the game data but is never shown to the player.
+- **Undiscovered** — the object is present in the zone but the faction has no knowledge of it. This state exists in the game data but a player always sees an empty list of objects under "undiscovered" section with a brief description explaining that some objects might be there so that the user would be aware of such possibility. In Dev Mode all Undiscovered Objects are displayed.
 
 State transitions are driven entirely by numeric thresholds on the faction visibility value. The full generation rules, threshold formulas, and scouting mechanics are documented in Sections 4.3.1 through 4.3.3.
 
