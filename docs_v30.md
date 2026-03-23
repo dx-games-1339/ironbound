@@ -771,16 +771,6 @@ When a character dies, their body is not removed from the game. The body remains
 
 A body remains in the zone until the POI despawns, at which point all objects including bodies are removed.
 
-**Inspecting bodies:**
-
-A Located body can be examined by any character using the Examine action. Inspection reveals:
-
-- The character's name, level, and faction at time of death.
-- All wounds and status effects present on the body at time of death, including their charge levels.
-- The body's full equipment and inventory contents, which can be looted using the Take or Gather resources actions.
-
-Animal bodies are subject to the same inspection rules. If an animal body is in the Located state for the player's faction, its information is fully transparent — including wounds.
-
 **Roster impact:**
 
 A dead player-controlled character is removed from the guild's active roster immediately upon death. They no longer count toward upkeep. Their body remains in the POI zone as described above and is independent of the roster system.
