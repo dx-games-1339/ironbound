@@ -732,7 +732,7 @@ Every wound instance tracks the following values:
 - **Degeneration value** — a base rate at which charges accumulate per turn (positive = worsening)
 - **Regeneration contribution** — derived from the character's regeneration characteristic; reduces charge accumulation each turn
 
-**Each turn**, the following calculation is performed for each active wound:
+**Each turn**, the following calculation is performed for each active wound (on each alive character in each POI Zone in each POI):
 
 1. A random value is rolled within the wound's degeneration range
 2. A random value is rolled within the character's regeneration range
