@@ -172,7 +172,7 @@ Every Located character — whether player-controlled, an animal, or dead — di
 - All active wounds with name, stage, current charges, and max charges displayed as a progress bar
 - Hunger stage with current charges and max charges
 - All other active status effects with their current state
-- Loyalty (player-controlled characters only)
+- Loyalty (NPC characters have loyalty towards their NPC faction, animals in most cases have 100% loyalty which can not decrease)
 
 This applies equally to animals. Once an animal is in the Located state for the player's faction, its full status — wounds, hunger, charges — is visible. Dead characters in the Located state display all status effects frozen at the moment of death.
 
