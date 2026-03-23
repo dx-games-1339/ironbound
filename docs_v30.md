@@ -540,19 +540,6 @@ Generic wounds are stackable — no slot conflicts.
 
 When a wound progresses via charge injection (repeat hit to an occupied slot), the wound advances to the next stage and its charge counter resets to that stage's starting value.
 
-### 4.9.6 Function Signature
-
-```
-applyDamage(character, rawDamage, hitType)
-  → { incapacitated: bool, woundApplied: WoundInstance | null }
-```
-
-| Parameter | Type | Description |
-|---|---|---|
-| `character` | Object | Full character state — current health, active wound slots, type |
-| `rawDamage` | Number | Rolled damage value |
-| `hitType` | String | `"bladed"`, `"blunt"`, `"piercing"` |
-
 ### 4.9.7 Incapacitated Status Effect
 
 Incapacitation is a charge-based status effect applied when a character receives a blow exceeding their current effective health. It is not a wound and does not progress into any other state — it simply depletes and removes itself.
