@@ -1181,18 +1181,18 @@ Every object that can appear in a POI zone has the following characteristics. So
 The object type determines which standard actions are available on the object. Each type maps to a set of common and object-specific actions defined in Section 4.6.
 
 | Type | Standard actions | Appearance in a "Known" state | Notes |
-|---|---|---|
-| **Rock** | Examine, Gather resources, Move | 95% Unidentified Rock / 5% Unidentified Object | Yields stone or ore. Requires a tool for gathering. |
-| **Tree** | Examine, Cut down, Gather resources | 90% Unidentified Tree / 5% Unidentified Vegetation / 5% Unidentified Object | Yields timber and firewood. Cut down requires sharp tool ≥ 70%. |
-| **Bush** | Examine, Gather resources, Search, Cut down | 90% Unidentified Bush / 8% Unidentified Vegetation / 2% Unidentified Object | May yield berries, herbs, or concealed objects. |
-| **Plant** | Examine, Gather resources  | 90% Unidentified Plant / 8% Unidentified Vegetation / 2% Unidentified Tree | Yields food, herbs, or other organic material depending on species. |
-| **Pond** | Examine, Use | 100% Unidentified Water Source | May contain fish or hidden objects. |
-| **River** | Examine, Use, Move (cross) | 100% Unidentified Water Source | May contain fish or hidden objects. |
-| **Mushroom** | Examine, Take, Gather resources | 40% Unidentified Mushroom / 30% Unidentified Vegetation / 10% Unidentified Bush / 20% Unidentified Object | Typically small enough to be taken directly into inventory. |
-| **Fungal tree** | Examine, Cut down, Gather resources | 10% Unidentified Mushroom / 10% Unidentified Vegetation / 80% Unidentified Tree | Large fungal growth. Yields fungal material. Cut down requires sharp tool ≥ 50%. |
-| **Wooden house** | Examine, Search | 100% Unidentified Building | May contain containers and items. |
-| **Wooden barn** | Examine, Search | 100% Unidentified Building | Typically contains supplies, tools, or animals. |
-| **Stone house** | Examine, Search  | 100% Unidentified Building | Sturdier structure; may contain locked areas. |
+|---|---|---|---|
+| **Rock** | Examine, Gather resources, Move | Unidentified Rock | Yields stone or ore. Requires a tool for gathering. |
+| **Tree** | Examine, Cut down, Gather resources | Unidentified Tree | Yields timber and firewood. Cut down requires sharp tool ≥ 70%. |
+| **Bush** | Examine, Gather resources, Search, Cut down | Unidentified Bush | May yield berries, herbs, or concealed objects. |
+| **Plant** | Examine, Gather resources  | Unidentified Plant | Yields food, herbs, or other organic material depending on species. |
+| **Pond** | Examine, Use | Unidentified Water Source | May contain fish or hidden objects. |
+| **River** | Examine, Use, Move (cross) | Unidentified Water Source | May contain fish or hidden objects. |
+| **Mushroom** | Examine, Take, Gather resources | Unidentified Mushroom | Typically small enough to be taken directly into inventory. |
+| **Fungal tree** | Examine, Cut down, Gather resources | Unidentified Mushroom | Large fungal growth. Yields fungal material. Cut down requires sharp tool ≥ 50%. |
+| **Wooden house** | Examine, Search | Unidentified Building | May contain containers and items. |
+| **Wooden barn** | Examine, Search | Unidentified Building | Typically contains supplies, tools, or animals. |
+| **Stone house** | Examine, Search  | Unidentified Building | Sturdier structure; may contain locked areas. |
 
 #### 8.4.3 Object Tags
 
