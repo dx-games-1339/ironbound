@@ -53,3 +53,16 @@ Zone objects panel must be divided into three main sections:
 - Known objects (45% of zone panel height): a list of objects that the player knows exist but didn't yet located, objects from that list render with their names and icons replaced with type-based "known state appearance"
 - Undiscovered (10% of zone panel height): the smallest section of all three, it only holds an explanatory text "There might be unknown objects in this zone. Proceed to exploration in order to uncover them."
 
+All objects existing in the zone, including character groups are displayed in a list of Zone objects in the corresponding category (based on their visibility for the viewer).
+
+"Located-Known" sections of the zone are resizeable so that the player may change the size of each section based on the current needs. These sections are automatically scrolled to a particular object if that object is a target of the task in the task queue and the tasks assignee is being selected.
+
+Each object is displayed with the following properties:
+
+- Icon (Square for non-living objects, Diamond-shaped for characters)
+- Character icon if that character is currently performing actions with that object or is assigned a task that targets that object (characters icon is diamond-shaped), displayed to the right of the objects icon
+- Name (text), displayed on top of the objects icon
+- Visibility percentage (for the viewer), displayed to the left of the objects icon
+- Size (in game units, static objects property)
+- Material (resource type, displayed only for objects with 100% visibility), to the left of the objects size
+- Content (objects inventory, displayed only for objects with 100% visibility), to the left of the objects material
