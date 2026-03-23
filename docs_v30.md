@@ -48,8 +48,8 @@ The primary view. A scrollable 2D map rendered in WebGL.
 
 **Interactions:**
 - Click a city → open City Details Panel (same flow as POI — see POI visibility below). From the City Details Panel the player can click Enter City to open the City Layout.
-- Click a visible POI → open POI Layout
-- Click a group token → open Group Panel
+- Click a visible POI → open POI Details Panel. From the Details Panel the player can click Enter POI to open the POI Layout.
+- Click a group token → open Group Panel.
 - Pan and zoom the map
 
 **Coordinates:** Every city and POI on the global map has a fixed pair of coordinates. Distance between any two points is calculated from these coordinates using standard Euclidean distance. Coordinates are used internally for travel time calculations and are not displayed to the player as numbers.
