@@ -1144,7 +1144,6 @@ Every POI has:
 - **Coordinates** — a fixed position on the global map expressed as an (x, y) pair. Used to calculate distance to other map points and to determine travel time for groups. Not displayed to the player as numbers.
 - A **despawn timer** — number of turns until the POI disappears from the map
 - A **zone graph** — the internal layout of zones and passages
-- A **loot table** — an internal list of possible resources and artifacts the POI may contain. This is not visible to the player; discovering what a POI holds is part of the scouting challenge.
 
 ### 8.2 Spawn and Despawn
 
@@ -1155,13 +1154,7 @@ Every POI has:
 
 ### 8.3 Zone Graph Structure
 
-Each POI contains between 3 and 20 zones depending on size. Zone graphs follow these patterns:
-
-- **Linear** — zones form a single chain
-- **Branching** — one or more forks in the path
-- **Hub and spoke** — a central zone connects to several peripheral zones
-- **Complex** — a non-trivial graph with loops and multiple paths
-
+Each POI contains between 3 and 20 zones depending on size.
 The entry zone is always revealed and scouted on arrival. All other zones begin as Unknown.
 
 ### 8.4 Zone Objects
