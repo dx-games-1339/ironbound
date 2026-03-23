@@ -163,7 +163,6 @@ A panel opened by clicking a zone inside the POI Layout. The Zone Detail Panel i
 - List of Located objects in this zone, from the perspective of the player faction
 - List of Known objects in this zone (existence confirmed, location unknown)
 - List of Located characters and groups from other factions visible to the player faction, including their visible status effects (see Section 5 for status transparency rules). Living characters are displayed with a rhombus portrait icon; dead bodies are displayed with a square dead body icon (see Section 8.4.5)
-- Available actions for each player-controlled group or individual recruit in this zone
 
 **Character status display:**
 
