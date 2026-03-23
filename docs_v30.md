@@ -86,8 +86,8 @@ All portraits within the token use the rhombus icon shape consistent with the li
 
 Discovery is determined by two mechanisms:
 
-- **Intelligence network** — the guild maintains agents at HQ assigned to the *Gather Rumors* task (see Section 3.2). The number of agents and their capabilities determine how many POIs spawn as Discovered. In v1 this mechanic is partially active: the *Target publicly known POIs* world option (see Section 12.2) determines how many POIs are Discovered by default for all organizations regardless of Gather Rumors activity. The Gather Rumors task itself has no additional effect in v1 beyond this baseline.
-- **References** — during the exploration of a POI, a group may find a reference (a map fragment, a rumor, a captured informant) that directly discovers a specific other POI. This is the only way to discover POIs beyond the baseline public count.
+- **Intelligence network** — the guild maintains agents at HQ assigned to the *Gather Rumors* task (see Section 3.2). The number of agents and their capabilities determine how many POIs spawn as Discovered. In v1 this mechanic is a placeholder and has no actual effect.
+- **References** — during the exploration of a POI, a group may find a reference that directly discovers a specific other POI. This is the only way to discover POIs beyond the baseline public count.
 
 An Undiscovered POI reverts to nothing if its despawn timer expires before it is discovered — the opportunity is lost.
 
