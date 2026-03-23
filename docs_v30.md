@@ -664,7 +664,7 @@ A standard day cycle consists of 6 turns. Of these, 1 turn is assumed to be spen
 
 **Carrying capacity**
 
-Each character has an individual carrying capacity measured in abstract units. Items stored in a character's unequipped inventory each consume a defined number of units. A character cannot pick up or be assigned an item that would cause their total carried units to exceed their available capacity.
+Each character has an individual carrying capacity measured in abstract units. Items stored in a character's unequipped inventory each consume a defined number of units. A character cannot pick up or be assigned an item that would cause their total carried units to exceed their available capacity. If an effect would reduce the total carrying capacity for a unit then it will not lose any of the items it was already carrying but it will not be able to pick or get any new items until the carrying capacity is freed up.
 
 Capacity is composed of two parts:
 
