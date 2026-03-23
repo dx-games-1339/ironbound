@@ -289,7 +289,7 @@ Zone-wide actions have no specific target. They are assigned to a group and appl
 
 ### 4.6 Object Interactions
 
-Object interactions require a specific target. A target must be in the Located state before any object interaction can be assigned, with one exception: a group may be assigned to **Search for** a Known object, which applies a focused visibility increase to that specific object on each execution and a smaller secondary increase to a random set of other objects in the zone. See the Search for entry below for the full numeric mechanic.
+Object interactions require a specific target. A target must be in the Located state before any object interaction can be assigned, with one exception: a group may be assigned to **"Search for"** a Known object, which applies a focused visibility increase to that specific object on each execution and a smaller secondary increase to a random set of other objects in the zone. See the "Search for" entry below for the full numeric mechanic.
 
 Object interactions are divided into four subcategories:
 
