@@ -1012,6 +1012,11 @@ Identical stages and penalties to left leg. Tracked independently.
 | Characteristic | Range |
 |---|---|
 | Health | 90 – 130 |
+| Strength | 9 - 11 |
+| Dexterity | 9 - 11 |
+| Perception | 9 - 11 |
+| Movement Speed | 8 - 12 |
+| Regeneration | 5 - 5 |
 | Base carrying capacity | 5 – 10 |
 
 Additional races may be introduced in future updates. Each new race is defined as an independent wound table and characteristic range without requiring changes to the damage pipeline.
