@@ -1144,7 +1144,7 @@ The codebase must treat player-controlled groups and NPC groups as instances of 
 
 ## 7. Groups
 
-A **group** is a named collection of one or more recruits that acts as a single unit on the Global Map and inside POIs.
+A **group** is a named collection of one or more characters (player-controlled, NPC or animals) that acts as a single unit on the Global Map (only player-controlled Groups) and inside POIs.
 
 - Groups are created and managed in the HQ Group Manager panel
 - A group can contain a maximum of 9 recruits. A player can assign more than one group to the same POI simultaneously, allowing larger operations to be split across multiple groups.
