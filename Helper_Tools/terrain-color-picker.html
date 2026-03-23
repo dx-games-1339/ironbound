@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ironbound — Terrain Colour Picker</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cinzel:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070910; --panel: #0c0f18; --border: #1c2333; --text: #8a98b0;
+  --textb: #c8d4e4; --textd: #3a4558; --gold: #c8901a; --fm: 'Share Tech Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; background:var(--bg); color:var(--text); font-family:var(--fm); overflow:hidden; }
+
+#app { display:flex; height:100vh; }
+
+/* MAP */
+#map-wrap { flex:1; position:relative; overflow:hidden; background:#040609; cursor:grab; }
+#map-wrap.dragging { cursor:grabbing; }
+#map-canvas { position:absolute; top:0; left:0; }
+
+/* PANEL */
+#panel {
+  width: 320px; background: var(--panel); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden; flex-shrink:0;
+}
+#panel-hd {
+  padding: 18px 18px 14px; border-bottom: 1px solid var(--border);
+}
+#panel-hd .title { font-family:'Cinzel',serif; font-size:14px; color:var(--gold); letter-spacing:.12em; margin-bottom:3px; }
+#panel-hd .sub { font-size:9px; color:var(--textd); letter-spacing:.15em; text-transform:uppercase; }
+#panel-body { flex:1; overflow-y:auto; padding:14px; }
+
+/* TERRAIN BLOCK */
+.terrain-block { margin-bottom:20px; }
+.terrain-label {
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+}
+.terrain-swatch {
+  width:28px; height:28px; border:1px solid var(--border); flex-shrink:0;
+  border-radius:2px; transition:background .1s;
+}
+.terrain-name { font-size:12px; color:var(--textb); letter-spacing:.1em; text-transform:uppercase; }
+.terrain-hex {
+  margin-left:auto; font-size:11px; color:var(--gold); letter-spacing:.08em;
+  cursor:pointer; padding:2px 6px; border:1px solid transparent; border-radius:2px;
+  transition:all .15s;
+}
+.terrain-hex:hover { border-color:var(--border); background:var(--bg); }
+.terrain-hex.copied { color:#60c070; border-color:#206020; }
+
+/* SLIDERS */
+.sliders { display:flex; flex-direction:column; gap:7px; }
+.slider-row { display:flex; align-items:center; gap:8px; }
+.slider-letter { font-size:9px; color:var(--textd); width:14px; flex-shrink:0; letter-spacing:.12em; }
+input[type=range] {
+  flex:1; height:3px; -webkit-appearance:none; appearance:none;
+  background:var(--border); border-radius:2px; outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:13px; height:13px; border-radius:50%;
+  background:#c8d4e4; border:2px solid var(--border); cursor:pointer;
+  transition:background .1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { background:#fff; }
+input[type=range].r-track { background:linear-gradient(90deg,#000,#f00); }
+input[type=range].g-track { background:linear-gradient(90deg,#000,#0f0); }
+input[type=range].b-track { background:linear-gradient(90deg,#000,#00f); }
+.slider-val { font-size:10px; color:var(--textd); width:28px; text-align:right; flex-shrink:0; }
+
+/* DIVIDER */
+.block-divider { height:1px; background:var(--border); margin:4px 0 16px; }
+
+/* FOOTER */
+#panel-ft {
+  padding:12px 14px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px;
+}
+.copy-all-btn {
+  width:100%; padding:10px; background:var(--bg); border:1px solid var(--border);
+  color:var(--gold); font-family:var(--fm); font-size:11px; letter-spacing:.12em;
+  cursor:pointer; transition:all .15s; border-radius:2px;
+}
+.copy-all-btn:hover { border-color:var(--gold); background:rgba(100,65,10,.12); }
+.copy-all-btn.copied { color:#60c070; border-color:#206020; }
+#all-codes {
+  font-size:9px; color:var(--textd); line-height:1.9; letter-spacing:.06em;
+  padding:8px; background:var(--bg); border:1px solid var(--border); border-radius:2px;
+  display:none;
+}
+
+/* MAP CONTROLS */
+#map-controls {
+  position:absolute; bottom:10px; left:10px; display:flex; gap:6px; z-index:10;
+}
+.map-btn {
+  padding:5px 12px; background:rgba(12,15,24,.9); border:1px solid var(--border);
+  color:var(--text); font-family:var(--fm); font-size:10px; cursor:pointer;
+  border-radius:2px; transition:all .15s; letter-spacing:.08em;
+}
+.map-btn:hover { border-color:#344060; color:var(--textb); }
+
+/* LEGEND */
+#legend {
+  position:absolute; top:10px; left:10px; background:rgba(7,9,16,.88);
+  border:1px solid var(--border); padding:10px 12px; border-radius:2px;
+}
+.legend-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; font-size:10px; color:var(--text); }
+.legend-row:last-child { margin-bottom:0; }
+.legend-swatch { width:16px; height:16px; border:1px solid rgba(255,255,255,.06); border-radius:1px; flex-shrink:0; }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--panel); }
+::-webkit-scrollbar-thumb { background:#1c2333; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map-wrap">
+    <canvas id="map-canvas"></canvas>
+    <div id="legend"></div>
+    <div id="map-controls">
+      <button class="map-btn" onclick="zoomMap(-1)">− Zoom</button>
+      <button class="map-btn" onclick="zoomMap(1)">+ Zoom</button>
+      <button class="map-btn" onclick="resetView()">Reset View</button>
+    </div>
+  </div>
+
+  <div id="panel">
+    <div id="panel-hd">
+      <div class="title">TERRAIN COLOURS</div>
+      <div class="sub">Adjust RGB · scroll to zoom · drag to pan</div>
+      <div class="sub" style="margin-top:4px;color:var(--textd)">Seed: <span id="seed-display">42</span></div>
+    </div>
+    <div id="panel-body" id="controls"></div>
+    <div id="panel-ft">
+      <div id="stats-display" style="font-size:9px;color:var(--textd);line-height:2;letter-spacing:.06em;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:2px;margin-bottom:8px;"></div>
+      <button class="copy-all-btn" onclick="regenerate()" style="margin-bottom:6px;color:var(--textb)">&#9654; REGENERATE MAP</button>
+      <button class="copy-all-btn" id="copy-all-btn" onclick="copyAllCodes()">&#9646;&#9646; COPY ALL COLOUR CODES</button>
+      <div id="all-codes"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── TERRAIN DEFINITIONS ──────────────────────────────────────────────────────
+const TERRAINS = [
+  { id:'plains',    name:'Plains',    r:19,  g:28,  b:14  },
+  { id:'forest',    name:'Forest',    r:12,  g:22,  b:10  },
+  { id:'mountains', name:'Mountains', r:45,  g:42,  b:36  },
+  { id:'snow',      name:'Snow',      r:180, g:188, b:200 },
+  { id:'water',     name:'Water',     r:8,   g:18,  b:32  },
+  { id:'desert',    name:'Desert',    r:60,  g:48,  b:20  },
+  { id:'wasteland', name:'Wasteland', r:32,  g:26,  b:22  },
+];
+
+const colors = {};
+TERRAINS.forEach(t => { colors[t.id] = { r:t.r, g:t.g, b:t.b }; });
+
+function toHex(c) {
+  const h = x => x.toString(16).padStart(2,'0').toUpperCase();
+  return '#' + h(c.r) + h(c.g) + h(c.b);
+}
+
+// ── WORLD GENERATION ─────────────────────────────────────────────────────────
+function rng(s) { s=(s^0xdeadbeef)>>>0; return ()=>{ s=(Math.imul(s^(s>>>16),0x45d9f3b))>>>0; s^=s>>>15; return (s>>>0)/4294967296; }; }
+
+const MAP = 180;
+const MIN_COVERAGE = 0.05; // each terrain type must occupy at least 5% of tiles
+const TERRAIN_IDS = ['plains','forest','mountains','snow','water','desert','wasteland'];
+let tiles = [];
+let currentSeed = 42;
+let lastStats = {};
+
+function generateTerrain(seed) {
+  const totalTiles = MAP * MAP;
+  const minTiles = Math.ceil(totalTiles * MIN_COVERAGE);
+
+  function noise(x, y, freq, s2) {
+    return Math.sin(x * freq + s2) * Math.cos(y * freq * 0.8 + s2 * 1.3)
+         + Math.cos((x+y) * freq * 0.6) * Math.sin((x-y) * freq * 0.4 + s2 * 0.7);
+  }
+
+  // Generate raw noise-based tiles
+  function generateRaw(seed) {
+    const raw = [];
+    for (let y = 0; y < MAP; y++) {
+      raw[y] = [];
+      for (let x = 0; x < MAP; x++) {
+        const elev  = noise(x,y,0.06,seed*0.01+1.2)*0.5 + noise(x,y,0.02,seed*0.013+3.7)*0.35 + noise(x,y,0.12,seed*0.007+0.9)*0.2;
+        const moist = noise(x,y,0.05,seed*0.011+5.1)*0.5 + noise(x,y,0.03,seed*0.009+8.3)*0.4;
+        const temp  = noise(x,y,0.03,seed*0.008+2.4)*0.3 + (1 - y/MAP)*0.5;
+        const en = (elev+2)/4, mn = (moist+2)/4, tn = Math.max(0,Math.min(1,temp));
+        let type;
+        if      (en < 0.28)                    type = 'water';
+        else if (en > 0.72)                    type = tn < 0.38 ? 'snow' : 'mountains';
+        else if (tn < 0.3)                     type = 'snow';
+        else if (tn > 0.75 && mn < 0.4)        type = 'desert';
+        else if (mn < 0.3  && tn > 0.5)        type = 'wasteland';
+        else if (mn > 0.55)                    type = 'forest';
+        else                                   type = 'plains';
+        raw[y][x] = { type, elev:(elev+2)/4, moist:(moist+2)/4, temp:tn };
+      }
+    }
+    return raw;
+  }
+
+  // Count distribution
+  function count(raw) {
+    const c = {};
+    TERRAIN_IDS.forEach(id => c[id] = 0);
+    for (let y=0; y<MAP; y++) for (let x=0; x<MAP; x++) c[raw[y][x].type]++;
+    return c;
+  }
+
+  // Redistribute under-represented terrains by adjusting thresholds
+  // Strategy: collect all tiles sorted by how "borderline" they are on
+  // each axis, then reassign the deficit terrain to the most eligible tiles.
+  function redistribute(raw, counts) {
+    const deficits = TERRAIN_IDS.filter(id => counts[id] < minTiles);
+    if (!deficits.length) return raw; // already fine
+
+    // For each deficit terrain, collect candidate tiles (those that are
+    // "neighbours" of where that terrain naturally appears) and force-assign
+    // enough of them to meet the minimum.
+    const result = raw.map(row => row.map(cell => ({...cell})));
+
+    deficits.forEach(targetType => {
+      const needed = minTiles - counts[targetType];
+
+      // Score every non-water tile by affinity for this terrain type
+      const candidates = [];
+      for (let y=0; y<MAP; y++) {
+        for (let x=0; x<MAP; x++) {
+          const cell = result[y][x];
+          if (cell.type === 'water' || cell.type === targetType) continue;
+          let score = 0;
+          const {elev:en, moist:mn, temp:tn} = cell;
+          if (targetType === 'snow')      score = (1-tn) + (en > 0.6 ? en : 0);
+          if (targetType === 'mountains') score = en + (tn > 0.4 ? 0.3 : 0);
+          if (targetType === 'desert')    score = tn + (1-mn);
+          if (targetType === 'wasteland') score = (1-mn)*0.6 + tn*0.4;
+          if (targetType === 'forest')    score = mn + (tn > 0.3 ? 0.3 : 0);
+          if (targetType === 'plains')    score = 0.5 + (1 - Math.abs(mn-0.5)) * 0.5;
+          candidates.push({y, x, score});
+        }
+      }
+      // Sort by best affinity, take the top `needed`
+      candidates.sort((a,b) => b.score - a.score);
+      for (let i=0; i<Math.min(needed, candidates.length); i++) {
+        const {y, x} = candidates[i];
+        counts[result[y][x].type]--;
+        result[y][x].type = targetType;
+        counts[targetType]++;
+      }
+    });
+    return result;
+  }
+
+  const raw = generateRaw(seed);
+  const counts = count(raw);
+  const balanced = redistribute(raw, counts);
+
+  // Flatten to simple type strings
+  const finalTiles = [];
+  for (let y=0; y<MAP; y++) {
+    finalTiles[y] = [];
+    for (let x=0; x<MAP; x++) finalTiles[y][x] = balanced[y][x].type;
+  }
+
+  // Compute final stats
+  const finalCounts = {};
+  TERRAIN_IDS.forEach(id => finalCounts[id] = 0);
+  for (let y=0; y<MAP; y++) for (let x=0; x<MAP; x++) finalCounts[finalTiles[y][x]]++;
+  lastStats = finalCounts;
+
+  return finalTiles;
+}
+
+function regenerate() {
+  currentSeed = Math.floor(Math.random() * 65535);
+  tiles = generateTerrain(currentSeed);
+  updateSeedDisplay();
+  updateStatsDisplay();
+  drawMap();
+}
+
+tiles = generateTerrain(currentSeed);
+
+// ── MAP RENDER ────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('map-canvas');
+const ctx = canvas.getContext('2d');
+let cam = { ox:0, oy:0, zoom:1, ts:5 };
+let drag = null;
+
+function ets() { return cam.ts * cam.zoom; }
+function w2s(wx, wy) { const ts=ets(); return [wx*ts - cam.ox, wy*ts - cam.oy]; }
+function s2w(sx, sy) { const ts=ets(); return [(sx+cam.ox)/ts, (sy+cam.oy)/ts]; }
+
+function resizeCanvas() {
+  const wrap = document.getElementById('map-wrap');
+  const dpr = devicePixelRatio;
+  canvas.width  = wrap.clientWidth  * dpr;
+  canvas.height = wrap.clientHeight * dpr;
+  canvas.style.width  = wrap.clientWidth  + 'px';
+  canvas.style.height = wrap.clientHeight + 'px';
+  drawMap();
+}
+
+function resetView() {
+  const wrap = document.getElementById('map-wrap');
+  const ts = Math.min((wrap.clientWidth - 20) / MAP, (wrap.clientHeight - 20) / MAP);
+  cam.ts = ts; cam.zoom = 1;
+  cam.ox = -(wrap.clientWidth  - MAP * ts) / 2;
+  cam.oy = -(wrap.clientHeight - MAP * ts) / 2;
+  drawMap();
+}
+
+// Build colour lookup table for fast rendering
+let colorCache = {};
+function rebuildColorCache() {
+  colorCache = {};
+  TERRAINS.forEach(t => {
+    const c = colors[t.id];
+    colorCache[t.id] = `rgb(${c.r},${c.g},${c.b})`;
+  });
+}
+rebuildColorCache();
+
+function drawMap() {
+  const dpr = devicePixelRatio;
+  const lw = canvas.width/dpr, lh = canvas.height/dpr;
+  const ts = ets();
+
+  ctx.save(); ctx.scale(dpr, dpr);
+  ctx.fillStyle = '#040609'; ctx.fillRect(0, 0, lw, lh);
+
+  const x0 = Math.max(0, Math.floor(s2w(0,0)[0]));
+  const y0 = Math.max(0, Math.floor(s2w(0,0)[1]));
+  const x1 = Math.min(MAP, Math.ceil(s2w(lw,0)[0]) + 1);
+  const y1 = Math.min(MAP, Math.ceil(s2w(0,lh)[1]) + 1);
+
+  for (let ty = y0; ty < y1; ty++) {
+    for (let tx = x0; tx < x1; tx++) {
+      const type = tiles[ty]?.[tx];
+      if (!type) continue;
+      const [sx, sy] = w2s(tx, ty);
+      ctx.fillStyle = colorCache[type] || '#111';
+      ctx.fillRect(sx, sy, ts + 0.5, ts + 0.5);
+    }
+  }
+
+  // Subtle grid at high zoom
+  if (ts > 24) {
+    ctx.strokeStyle = 'rgba(255,255,255,.025)';
+    ctx.lineWidth = 0.5;
+    for (let tx = x0; tx < x1; tx++) {
+      const [sx] = w2s(tx, 0);
+      ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, lh); ctx.stroke();
+    }
+    for (let ty = y0; ty < y1; ty++) {
+      const [, sy] = w2s(0, ty);
+      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(lw, sy); ctx.stroke();
+    }
+  }
+
+  // Sample city dots for reference scale
+  const cityPositions = [{x:32,y:32},{x:148,y:28},{x:90,y:148}];
+  cityPositions.forEach(c => {
+    const [sx, sy] = w2s(c.x + 0.5, c.y + 0.5);
+    const cr = Math.max(3, ts * 0.9);
+    ctx.beginPath(); ctx.arc(sx, sy, cr, 0, Math.PI*2);
+    ctx.fillStyle = '#4a7eb0'; ctx.shadowColor = '#2a5880'; ctx.shadowBlur = 6;
+    ctx.fill(); ctx.shadowBlur = 0;
+    ctx.beginPath(); ctx.arc(sx, sy, cr * 0.4, 0, Math.PI*2);
+    ctx.fillStyle = '#040608'; ctx.fill();
+  });
+
+  ctx.restore();
+  updateLegend();
+}
+
+function updateLegend() {
+  const el = document.getElementById('legend');
+  el.innerHTML = TERRAINS.map(t =>
+    `<div class="legend-row">
+      <div class="legend-swatch" style="background:${toHex(colors[t.id])}"></div>
+      ${t.name}
+    </div>`
+  ).join('');
+}
+
+// ── CONTROLS ─────────────────────────────────────────────────────────────────
+function buildControls() {
+  const body = document.getElementById('panel-body');
+  body.innerHTML = TERRAINS.map(t => `
+    <div class="terrain-block" id="block-${t.id}">
+      <div class="terrain-label">
+        <div class="terrain-swatch" id="swatch-${t.id}" style="background:${toHex(colors[t.id])}"></div>
+        <span class="terrain-name">${t.name}</span>
+        <span class="terrain-hex" id="hex-${t.id}" onclick="copyHex('${t.id}')">${toHex(colors[t.id])}</span>
+      </div>
+      <div class="sliders">
+        <div class="slider-row">
+          <span class="slider-letter">R</span>
+          <input type="range" class="r-track" min="0" max="255" value="${colors[t.id].r}"
+            oninput="updateChannel('${t.id}','r',this.value)">
+          <span class="slider-val" id="rv-${t.id}">${colors[t.id].r}</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-letter">G</span>
+          <input type="range" class="g-track" min="0" max="255" value="${colors[t.id].g}"
+            oninput="updateChannel('${t.id}','g',this.value)">
+          <span class="slider-val" id="gv-${t.id}">${colors[t.id].g}</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-letter">B</span>
+          <input type="range" class="b-track" min="0" max="255" value="${colors[t.id].b}"
+            oninput="updateChannel('${t.id}','b',this.value)">
+          <span class="slider-val" id="bv-${t.id}">${colors[t.id].b}</span>
+        </div>
+      </div>
+    </div>
+    <div class="block-divider"></div>
+  `).join('');
+}
+
+function updateChannel(id, channel, val) {
+  colors[id][channel] = parseInt(val);
+  document.getElementById(`${channel}v-${id}`).textContent = val;
+  const hex = toHex(colors[id]);
+  document.getElementById(`swatch-${id}`).style.background = hex;
+  document.getElementById(`hex-${id}`).textContent = hex;
+  document.getElementById(`hex-${id}`).classList.remove('copied');
+  rebuildColorCache();
+  drawMap();
+}
+
+function copyHex(id) {
+  const hex = toHex(colors[id]);
+  navigator.clipboard.writeText(hex).then(() => {
+    const el = document.getElementById(`hex-${id}`);
+    el.textContent = 'COPIED!'; el.classList.add('copied');
+    setTimeout(() => { el.textContent = hex; el.classList.remove('copied'); }, 1400);
+  });
+}
+
+function copyAllCodes() {
+  const lines = TERRAINS.map(t => `${t.name.padEnd(12)}: ${toHex(colors[t.id])}`).join('\n');
+  navigator.clipboard.writeText(lines).then(() => {
+    const btn = document.getElementById('copy-all-btn');
+    const codesEl = document.getElementById('all-codes');
+    btn.textContent = '✓ COPIED TO CLIPBOARD';
+    btn.classList.add('copied');
+    codesEl.style.display = 'block';
+    codesEl.textContent = TERRAINS.map(t => `${t.name}: ${toHex(colors[t.id])}`).join('\n');
+    setTimeout(() => {
+      btn.textContent = '▐▐ COPY ALL COLOUR CODES';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── MAP EVENTS ────────────────────────────────────────────────────────────────
+const wrap = document.getElementById('map-wrap');
+wrap.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  drag = { sx:e.clientX, sy:e.clientY, ox:cam.ox, oy:cam.oy };
+  wrap.classList.add('dragging');
+});
+wrap.addEventListener('mousemove', e => {
+  if (!drag) return;
+  cam.ox = drag.ox - (e.clientX - drag.sx);
+  cam.oy = drag.oy - (e.clientY - drag.sy);
+  drawMap();
+});
+wrap.addEventListener('mouseup',   () => { drag=null; wrap.classList.remove('dragging'); });
+wrap.addEventListener('mouseleave',() => { drag=null; wrap.classList.remove('dragging'); });
+wrap.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = wrap.getBoundingClientRect();
+  const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+  const [wx, wy] = s2w(sx, sy);
+  cam.zoom = Math.max(0.3, Math.min(20, cam.zoom * (e.deltaY > 0 ? 0.85 : 1.18)));
+  const ts = ets(); cam.ox = wx*ts - sx; cam.oy = wy*ts - sy;
+  drawMap();
+}, { passive:false });
+
+function zoomMap(dir) {
+  const wrap = document.getElementById('map-wrap');
+  const cx = wrap.clientWidth/2, cy = wrap.clientHeight/2;
+  const [wx, wy] = s2w(cx, cy);
+  cam.zoom = Math.max(0.3, Math.min(20, cam.zoom * (dir > 0 ? 1.3 : 0.77)));
+  const ts = ets(); cam.ox = wx*ts - cx; cam.oy = wy*ts - cy;
+  drawMap();
+}
+
+window.addEventListener('resize', () => { resizeCanvas(); });
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function updateSeedDisplay() {
+  const el = document.getElementById('seed-display');
+  if (el) el.textContent = currentSeed;
+}
+
+function updateStatsDisplay() {
+  const el = document.getElementById('stats-display');
+  if (!el) return;
+  const total = MAP * MAP;
+  el.innerHTML = TERRAIN_IDS.map(id => {
+    const pct = ((lastStats[id]||0) / total * 100).toFixed(1);
+    const ok = (lastStats[id]||0) >= Math.ceil(total * MIN_COVERAGE);
+    const col = ok ? 'var(--textd)' : 'var(--redb)';
+    return `<span style="color:${col}">${TERRAIN_IDS.indexOf(id)>-1?TERRAINS.find(t=>t.id===id).name:id}: ${pct}%</span>`;
+  }).join(' &nbsp;·&nbsp; ');
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+buildControls();
+resizeCanvas();
+resetView();
+updateSeedDisplay();
+updateStatsDisplay();
+</script>
+</body>
+</html>
