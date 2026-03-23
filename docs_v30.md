@@ -1251,7 +1251,6 @@ Gold is spent on:
 - Recruit upkeep (paid monthly, deducted on the first turn of the last day of each in-game month)
 - Hiring new recruits
 - Purchasing food, equipment, and weapons
-- Relocating HQ
 
 The guild dissolves (game over) if gold reaches zero and no income is expected within the next few turns (configurable threshold warning before hard game over).
 
