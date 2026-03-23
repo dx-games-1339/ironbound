@@ -268,7 +268,7 @@ A random integer is rolled in the range [2, 6] inclusive. This determines how ma
 
 3. **Apply the discovery pulse:**
 
-The `discovery_value` is added to the faction visibility of each of the selected objects. Objects are selected randomly **without replacement** from the full set of objects in the zone — each object can be selected at most once per discovery pulse. Any object — regardless of its current awareness state — can be selected. If the zone contains fewer objects than the rolled count, all objects in the zone receive the pulse. Objects whose faction visibility would exceed `upper_bound_visibility` after the addition are capped at `upper_bound_visibility`.
+The `discovery_value` is added to the faction visibility of each of the selected objects. Objects are selected randomly **without replacement** from the full set of objects in the zone — each object can be selected at most once per discovery pulse. Any object — regardless of its current awareness state — can be selected. If the zone contains fewer objects than the rolled count, all objects in the zone receive the pulse. Objects whose faction visibility would exceed `ceiling visibility` after the addition are capped at `ceiling visibility`.
 
 After each discovery pulse, awareness states are re-evaluated for all affected objects and transitions to Known or Located are applied immediately if the thresholds are crossed.
 
