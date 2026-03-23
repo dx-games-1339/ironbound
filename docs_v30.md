@@ -1207,20 +1207,11 @@ Tags are modifiers attached to individual object instances at spawn. An object m
 
 #### 8.4.4 Unknown Object Display
 
-Objects that are Known but not yet Located are displayed with a placeholder representation rather than their true appearance. This allows a player to know something exists in a zone without knowing exactly what it is. The placeholder name and icon are determined by a broad category mapping:
+Objects that are Known but not yet Located are displayed with a placeholder representation rather than their true appearance. This allows a player to know something exists in a zone without knowing exactly what it is. The placeholder name and icon are determined by a broad category mapping.
 
-| True type | Placeholder display name |
-|---|---|
-| Wooden house | Unidentified building |
-| Wooden barn | Unidentified building |
-| Stone house | Unidentified building |
-| Rock | Stone formation |
-| Tree / Fungal tree | Large growth |
-| Bush / Plant | Vegetation |
-| Pond / River | Water source |
-| Mushroom | Small growth |
+The placeholder removes type-specific detail but may still convey partial information — for example, a Known object categorised as "Unidentified building" tells the player a structure is present without revealing its contents or layout. 
 
-The placeholder removes type-specific detail but may still convey partial information — for example, a Known object categorised as "Unidentified building" tells the player a structure is present without revealing its contents or layout.
+Object size property is always displayed to the player even in its "Known" state.
 
 #### 8.4.5 Object Icons and Character Portraits
 
