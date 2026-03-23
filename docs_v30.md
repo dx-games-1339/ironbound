@@ -186,14 +186,11 @@ The zone is the primary arena of gameplay. This section documents how zones work
 
 Each zone has a set of static and dynamic properties that govern how it behaves.
 
-**Static properties:**
+**Properties:**
 
-- **Size** — a fixed numeric value representing the physical area of the zone. Size does not change during a playthrough. It affects the cost and yield of awareness actions: a larger zone takes more turns of Scouting to cover and each individual Scout action reveals fewer objects relative to the total number present. Larger zones can also contain more objects overall. Size is not displayed to the player as a number but is reflected in the zone's visual scale in the POI graph and in how quickly scouting progresses.
-
-**Dynamic properties (zone conditions):**
-
-- **Light level** — a value from 0% (absolute darkness) to 100% (full daylight). Light level affects what characters can perceive and how quickly they detect objects. Diurnal characters perform well at high light levels; nocturnal creatures may be comfortable around 30% but are also impaired in absolute darkness.
-- **Weather effects** — conditions such as rain or sandstorm that can be applied to individual zones. Weather affects all objects and characters in the zone and may restrict certain actions or alter how quickly characters are detected.
+- **Size** — a fixed numeric value representing the physical area of the zone. Size does not change during a playthrough and is only assigned during the POI generation once. It affects the cost and yield of awareness actions. Larger zones can also contain more objects overall. Size is displayed to the player as a number.
+- **Light level** — a value from 0% (absolute darkness) to 100% (full daylight). Light level affects what characters can perceive and how quickly they detect objects. Diurnal characters perform well at high light levels; nocturnal creatures may be comfortable around 30% but are also impaired in absolute darkness. In V1 Light Levels have no effect and are a placeholder.
+- **Weather effects** — conditions such as rain or sandstorm that can be applied to individual zones. Weather affects all objects and characters in the zone and may restrict certain actions or alter how quickly these actions are performed. Weather effects may passivle apply status effects on characters or have a chance of applying these effects every turn.
 - **Hazard conditions** — passive conditions that apply damage probabilistically when characters perform certain actions in the zone. Each hazard condition specifies which actions trigger it, the probability of each damage event, and the damage value. Damage is rolled per action attempt, not per full action execution. See Section 4.9.2 for the full hazard condition model.
 
 ### 4.2 Living Characters and Animals
