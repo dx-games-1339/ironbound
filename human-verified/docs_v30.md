@@ -2,7 +2,7 @@
 
 # Ironbound — Game Design Document
 
-**Version:** 4.0-draft  
+**Version:** 4.1-draft  
 **Target URL:** `https://dx-games-1339.github.io/strategy`  
 **Renderer:** WebGL 2D, single-page application  
 **Hosting:** GitHub Pages (static, no backend)
@@ -232,9 +232,9 @@ Each object has the following visibility characteristics:
 
 Each faction has its own visibility value for each object, but these values ​​always start from the object's initial visibility. Objects whose visibility to a faction exceeds 34% of their ceiling visibility value become "Known" to that faction. Objects whose visibility to a faction exceeds 70% of their ceiling visibility value become "Located" to that faction.
 
-When a POI is generated — either at world generation or when a new POI spawns dynamically — each zone object is assigned a **_discoverability_level**: an integer value in the range 0–4. Faction visibility values are stored per object per faction and increase only through character actions.
+When a POI is generated — either at world generation or when a new POI spawns dynamically — each zone object is assigned a **_discoverabilityLevel**: an integer value in the range 0–4. Faction visibility values are stored per object per faction and increase only through character actions.
 
-Objects are assigned their ceiling visibility as `100 + (100 * 2 ^ _discoverability_level)`.
+Objects are assigned their ceiling visibility as `100 + (100 * 2 ^ _discoverabilityLevel)`.
 
 Objects are assigned initial visibility as a random value in the interval between 0 and objects ceiling visibility. Therefore it is assumed that some objects will be located as soon as the faction will enter the Zone. These objects will be immediately interactable.
 
@@ -741,7 +741,7 @@ Every wound instance tracks the following values:
 3. The net result `(degeneration roll − regeneration roll)` is added to the current charges
 4. If charges reach the max threshold, the wound progresses
 
-*Example:* A Light arm wound is applied with 230 starting charges and a progression threshold of 1000 (the charge value at which it advances to Medium). Its degeneration produces rolls in the range 10–20. The character's regeneration produces rolls in the range 5–10. On a given turn: degeneration rolls 15, regeneration rolls 7. Net: +8. Charges advance from 230 to 238. This continues each turn until charges reach 1000, at which point the wound advances to a Medium arm wound — which is applied at its own starting charges (400, as defined in Section 4.9.5), not at zero. The progression threshold and the starting charges of the next stage are independent values.
+*Example:* A Light arm wound is applied with 100 starting charges (as defined in Section 4.9.5). Its degeneration produces rolls in the range 10–20. The character's regeneration characteristic is 5, producing a fixed roll of 5 each turn. On a given turn: degeneration rolls 14, regeneration rolls 5. Net: +9. Charges advance from 100 to 109. This continues each turn until charges reach the wound's progression threshold — the charge value at which it advances to Medium. Progression thresholds are defined in the wound table data and are not specified in this document. When the threshold is reached, the wound advances to a Medium arm wound, which is applied at its own starting charges (150, as defined in Section 4.9.5), not at zero. The progression threshold and the starting charges of the next stage are independent values.
 
 #### 5.3.11 Wound Treatment
 
@@ -1440,10 +1440,10 @@ ZoneObject {
   name:                 string,
   type:                 string,     // see Section 8.4.2
   size:                 number,
-  discoverValue:        number,     // 0–4; controls the scale of faction_visibility_max
-  visibilityValue:      number,     // 0–4; controls starting position on the visibility spectrum
-  visibility:           number,     // rolled at spawn; faction visibility initialised to this on zone entry
-  upperBoundVisibility: number,     // rolled at spawn; hard ceiling for all faction visibility values
+  _discoverabilityLevel: number,  // 0–4; controls the scale of visibilityCeiling
+  visibilityValue:      number,   // 0–4; controls starting position on the visibility spectrum
+  visibility:           number,   // rolled at spawn; faction visibility initialised to this on zone entry
+  visibilityCeiling:    number,   // rolled at spawn; hard ceiling for all faction visibility values
   goldValueMin:         number,
   goldValueMax:         number,
   tags:                 [ Tag ],
@@ -1579,7 +1579,7 @@ IncapacitatedState {
 
 Group {
   id, name:    string,
-  role:        "Scout" | "Combat" | "Supply" | "Rescue",
+  role:        "Scout" | "Combat" | "Supply" | "Special",
   memberIds:   [ string ],  // recruit ids
   locationPoiId: string | null,
   locationZoneId: string | null,
@@ -2040,4 +2040,4 @@ The convention is to keep rule IDs stable once defined. If a rule is superseded,
 
 ---
 
-*End of document — v4.0-draft*
+*End of document — v4.1-draft*
