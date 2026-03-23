@@ -280,6 +280,8 @@ Animal groups belong to their own factions. It is possible for two factions to o
 
 ### 4.5 Zone-wide Actions
 
+>NOTE: Actions in this section are game mechanics and pieces of game logic. Characters perform actions. Players can not invoke actions directly. Players assign tasks (for Groups or Characters within these Groups) and tasks result in Characters performing actions.
+
 Zone-wide actions have no specific target. They are assigned to a group and apply broadly to the zone or to all eligible objects within it.
 
 - **Scout** — the character actively searches the zone. Each action point investment (5 AP per attempt) applies a passive visibility increase to all objects in the zone. Each full execution fires a discovery pulse that applies a larger visibility increase to a random subset of objects. Both effects advance object awareness toward Known and Located for the scouting character's faction. Full mechanics are documented in Section 4.3.3.
@@ -289,6 +291,8 @@ Zone-wide actions have no specific target. They are assigned to a group and appl
 - **Wait** — hold position doing nothing.
 
 ### 4.6 Object Interactions
+
+>NOTE: Actions in this section are game mechanics and pieces of game logic. Characters perform actions. Players can not invoke actions directly. Players assign tasks (for Groups or Characters within these Groups) and tasks result in Characters performing actions.
 
 Object interactions require a specific target. A target must be in the Located state before any object interaction can be assigned, with one exception: a group may be assigned to **"Search for"** a Known object, which applies a focused visibility increase to that specific object on each execution and a smaller secondary increase to a random set of other objects in the zone. See the "Search for" entry below for the full numeric mechanic.
 
