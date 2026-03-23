@@ -700,7 +700,7 @@ Wounds fall into three structural categories that determine how they are applied
 
 - **Progressive wounds** — cannot stack. Each progressive wound occupies a single slot per body location. If a character already has a progressive wound on a given location and that same location is damaged again, the existing wound advances to the next severity stage rather than a new instance being added. Progressive wounds move through a fixed sequence of stages (e.g. Light → Medium → Severe). When the final stage is reached and further progression is triggered, the character becomes **Incapacitated** (see Section 4.9.6) instead of advancing further. For wounds on vital locations (head, chest) the final progression stage is Lethal, which causes immediate death.
 
-- **Special wounds** — applied as discrete status effects outside the progressive or stackable systems. They behave like stackable wounds in that multiple instances can be active simultaneously, but they represent specific injury types tied to particular damage sources. Example: *Animal Bite* (−20 max health), applied by animal attacks. Each bite is a separate instance. A human-like character can sustain 5–6 simultaneous animal bites before their effective maximum health reaches zero.
+- **Special wounds** — applied as discrete status effects outside the progressive or stackable systems. They behave like stackable wounds in that multiple instances can be active simultaneously, but they represent specific injury types tied to particular damage sources. Example: *Animal Bite* (−20 max health), applied by animal attacks. Each bite is a separate instance.
 
 #### 5.3.7 Lethal Wounds
 
