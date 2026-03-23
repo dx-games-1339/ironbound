@@ -217,66 +217,30 @@ A zone may contain a large number of objects — potentially hundreds. Each fact
 - **Known** — the faction knows this object exists somewhere in the zone but has not pinpointed its location. Interaction is not yet possible.
 - **Undiscovered** — the object is present in the zone but the faction has no knowledge of it. This state exists in the game data but a player always sees an empty list of objects under "undiscovered" section with a brief description explaining that some objects might be there so that the user would be aware of such possibility. In Dev Mode all Undiscovered Objects are displayed.
 
-State transitions are driven entirely by numeric thresholds on the faction visibility value. The full generation rules, threshold formulas, and scouting mechanics are documented in Sections 4.3.1 through 4.3.3.
+State transitions are driven by numeric thresholds on the faction visibility value. The full generation rules, threshold formulas, and scouting mechanics are documented in Sections 4.3.1 through 4.3.3.
 
 Characters also have their own visibility value, which is dynamic. A character can actively modify their visibility by performing certain actions.
 
-#### 4.3.1 Object Visibility Generation
+#### 4.3.1 Object Visibility
 
-When a POI is generated — either at world generation or when a new POI spawns dynamically — each zone object is assigned a **discoverability–visibility classification**: a pair of integer values `_discover_value` and `_visibility_value`, each in the range 0–4.
+Each object has the following visibility characteristics:
 
-- `_discover_value` — how much total effort is required to advance the object toward the Located state. 0 = easy to find; 4 = very hard to find.
-- `_visibility_value` — the object's starting position on the discoverability spectrum. A high value means the object begins closer to Located; a low value means it starts deep in the Undiscovered range.
+- Visibility ceiling
+- Initial visibility
 
-These two values are assigned randomly per object instance from ranges defined by the object's type. From them, three instance-specific visibility variables are derived:
+Each faction has its own visibility value for each object, but these values ​​always start from the object's initial visibility. Objects whose visibility to a faction exceeds 34% of their ceiling visibility value become "Known" to that faction. Objects whose visibility to a faction exceeds 70% of their ceiling visibility value become "Located" to that faction.
 
-**Step 1 — Compute the faction visibility ceiling:**
+When a POI is generated — either at world generation or when a new POI spawns dynamically — each zone object is assigned a **_discoverability_level**: an integer value in the range 0–4. Faction visibility values are stored per object per faction and increase only through character actions.
 
-> **faction_visibility_max = 2 ^ _discover_value × 300**
+Objects are assigned their ceiling visibility as `100 + (100 * 2 ^ _discoverability_level)`.
 
-This is the numeric ceiling of the faction visibility scale for this object. Values range from 300 (discover value 0) to 4800 (discover value 4).
-
-**Step 2 — Compute the initial visibility anchor:**
-
-> **initial_objects_visibility = (faction_visibility_max / 5) × _visibility_value**
-
-This sets the midpoint of the range from which the object's starting visibility is drawn.
-
-**Step 3 — Roll the object's starting visibility:**
-
-A random value is rolled in the range:
-
-> **[0.5 × initial_objects_visibility, initial_objects_visibility]**
-
-The result is assigned as the object's `visibility` characteristic. This is the faction visibility value at which a new faction starts when they first enter the zone — their initial awareness of this object before any scouting occurs.
-
-**Step 4 — Roll the upper bound:**
-
-A random value is rolled in the range:
-
-> **[0.8 × faction_visibility_max, 1.2 × faction_visibility_max]**
-
-The result is assigned as the object's `upper_bound_visibility`. All faction visibility values are bounded by this ceiling — no faction's visibility toward this object can exceed it.
+Objects are assigned initial visibility as a random value in the interval between 0 and objects ceiling visibility. Therefore it is assumed that some objects will be located as soon as the faction will enter the Zone. These objects will be immediately interactable.
 
 **Living objects — runtime mutability**
 
-For static zone objects (rocks, trees, containers, etc.) `visibility` and `upper_bound_visibility` are spawn-time constants. They do not change unless a character explicitly acts on them (e.g. via the Conceal action).
+For static zone objects (rocks, trees, containers, etc.) `visibility` and `ceiling visibility` are spawn-time constants. They do not change unless a character explicitly acts on them (e.g. via actions).
 
-For **living objects** — characters and character groups present in a zone — `visibility` and `upper_bound_visibility` are **runtime values** that can change at any time through actions such as Hide. When either value changes on a living object, the awareness states of all factions that have a visibility entry toward that object are re-evaluated immediately against the new thresholds. A faction that had Located a living object may lose that state and revert to Known or Undiscovered if the object's `upper_bound_visibility` increases sufficiently, and similarly a faction that had not yet Located an object may gain it if `upper_bound_visibility` decreases. Awareness state changes on living objects are applied in the same turn they occur.
-
-#### 4.3.2 Faction Visibility Thresholds
-
-Each faction's current visibility value toward an object determines the object's awareness state for that faction:
-
-| Condition | Awareness state |
-|---|---|
-| faction_visibility < 40% of upper_bound_visibility | Undiscovered |
-| faction_visibility ≥ 40% of upper_bound_visibility | Known |
-| faction_visibility > 90% of upper_bound_visibility | Located |
-
-When a new faction enters a zone for the first time, their visibility toward each object in that zone is initialised to the object's `visibility` characteristic (the value rolled in Section 4.3.1 Step 3). The awareness state is then evaluated immediately from this starting value — objects with a high starting visibility may be Known or even Located the moment a faction arrives, while low-visibility objects begin Undiscovered and require active scouting to surface.
-
-Faction visibility values are stored per object per faction and increase only through character actions. They never decrease naturally.
+For **living objects** — characters, animals and character groups present in a zone — `visibility` and `ceiling visibility` are **runtime values** that can change at any time through actions. When either value changes on a living object, the awareness states of all factions that have a visibility entry toward that object are re-evaluated immediately against the new thresholds. A faction that had Located a living object may lose that state and revert to Known or Undiscovered if the object's `ceiling visibility` increases sufficiently, and similarly a faction that had not yet Located an object may gain it if `ceiling visibility` decreases. Awareness state changes on living objects are applied in the same turn they occur.
 
 #### 4.3.3 Scout Zone — Awareness Mechanics
 
