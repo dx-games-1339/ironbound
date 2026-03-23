@@ -219,7 +219,7 @@ A zone may contain a large number of objects — potentially hundreds. Each fact
 
 State transitions are driven entirely by numeric thresholds on the faction visibility value. The full generation rules, threshold formulas, and scouting mechanics are documented in Sections 4.3.1 through 4.3.3.
 
-Characters also have their own visibility value, which is not fixed. A character can actively modify their visibility by performing certain actions — for example by hiding, which raises the threshold another faction must meet in order to locate them. A sufficiently capable scout or a group that searches a zone long enough can still locate a hiding character, but doing so requires greater effort than detecting one who is not concealed.
+Characters also have their own visibility value, which is dynamic. A character can actively modify their visibility by performing certain actions.
 
 #### 4.3.1 Object Visibility Generation
 
