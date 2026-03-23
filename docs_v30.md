@@ -205,7 +205,7 @@ Living characters and animals always belong to a Group (see Section 7 Groups). A
 - **Allied**
 - **Indifferent**
 
-Allied factions share visibility and object awareness with each other.
+Allied factions share visibility and object awareness with each other i.e. each turn each factions visibility towards each object in the Zone becomes the highest value among visibilities of all allied factions towards these objects.
 
 Disposition is independent for each pairing. It is entirely possible to enter a zone and find two groups of animals or characters already engaged in conflict that has nothing to do with the player's presence. The player may choose to intervene, avoid, observe, or exploit the situation. In future releases, NPC groups will also occupy zones and operate under the same disposition system.
 
