@@ -435,7 +435,7 @@ Multiple damage events on the same condition are rolled independently. A single 
 
 When a character receives damage the following steps are applied in order:
 
-1. **Incapacitation check** — only evaluated if `current_health > 0`. If `raw_damage ≥ current_health`, the character becomes Incapacitated. If `current_health ≤ 0` the character is already dead and this check is skipped. Initial charges are calculated as described in Section 4.9.7.
+1. **Incapacitation check** — only evaluated if `current_health > 0`. If `raw_damage ≥ current_health`, the character becomes Incapacitated. If `current_health ≤ 0` the character is already dead and this check is skipped. Initial charges are calculated as described in Section 4.9.6.
 2. **Wound probability calculation** — the damage ratio R is computed and used to select a wound severity tier.
 3. **Wound slot assignment** — the specific wound is selected from the character's available wound slots for that severity. If the slot is already occupied, charges are added to the existing wound instead (which may trigger progression).
 
@@ -447,7 +447,7 @@ All probability calculations are driven by a single normalised value:
 
 Where `character_current_health` is the effective maximum health after all active wound penalties.
 
-**Incapacitation:** if raw_damage ≥ character_current_health the character becomes Incapacitated regardless of wound outcome. Both can apply on the same hit. See Section 4.9.7 for charge calculation.
+**Incapacitation:** if raw_damage ≥ character_current_health the character becomes Incapacitated regardless of wound outcome. Both can apply on the same hit. See Section 4.9.6 for charge calculation.
 
 **Wound severity zones** — R maps to five tiers with overlapping soft boundaries:
 
@@ -540,7 +540,7 @@ Generic wounds are stackable — no slot conflicts.
 
 When a wound progresses via charge injection (repeat hit to an occupied slot), the wound advances to the next stage and its charge counter resets to that stage's starting value.
 
-### 4.9.7 Incapacitated Status Effect
+### 4.9.6 Incapacitated Status Effect
 
 Incapacitation is a charge-based status effect applied when a character receives a blow exceeding their current effective health. It is not a wound and does not progress into any other state — it simply depletes and removes itself.
 
@@ -584,7 +584,7 @@ A recruit's state is a combination of concurrent conditions rather than a single
 - **Available** — at HQ, ready to be assigned. Mutually exclusive with Deployed.
 - **Deployed** — assigned to a group currently on the map or inside a POI. Mutually exclusive with Available.
 - **Wounded** — carries one or more active wounds. May still be deployed depending on severity; some wounds do not prevent field activity while others restrict actions or reduce capability significantly. Can co-exist with Incapacitated.
-- **Incapacitated** — the character is temporarily unconscious and cannot perform any actions. Incapacitation is a charge-based status effect that depletes automatically each turn until the character regains consciousness. It is triggered either by receiving a blow exceeding the character's current effective health, or by a progressive wound being forced to advance beyond its final non-lethal stage. In both cases the initial charge count is determined by the standard incapacitation formula. A character can be both Wounded and Incapacitated at the same time — the Incapacitated condition takes precedence for UI display and task scheduling purposes. See Section 4.9.7 for the full mechanic.
+- **Incapacitated** — the character is temporarily unconscious and cannot perform any actions. Incapacitation is a charge-based status effect that depletes automatically each turn until the character regains consciousness. It is triggered either by receiving a blow exceeding the character's current effective health, or by a progressive wound being forced to advance beyond its final non-lethal stage. In both cases the initial charge count is determined by the standard incapacitation formula. A character can be both Wounded and Incapacitated at the same time — the Incapacitated condition takes precedence for UI display and task scheduling purposes. See Section 4.9.6 for the full mechanic.
 - **Dead** — the character has died. The body remains in the zone where death occurred as a persistent object (see Section 5.4). All other conditions are frozen at the moment of death.
 
 ### 5.2 Growth and Change
@@ -696,7 +696,7 @@ Wounds fall into three structural categories that determine how they are applied
 
 - **Stackable wounds** — can be applied to a character multiple times simultaneously, with each instance tracked independently. Each application adds its modifier separately. Example: a *Scratch* wound applies −3 max health per instance. A character can accumulate many scratches at once, each one counting individually toward their health penalty.
 
-- **Progressive wounds** — cannot stack. Each progressive wound occupies a single slot per body location. If a character already has a progressive wound on a given location and that same location is damaged again, the existing wound advances to the next severity stage rather than a new instance being added. Progressive wounds move through a fixed sequence of stages (e.g. Light → Medium → Severe). When the final stage is reached and further progression is triggered, the character becomes **Incapacitated** (see Section 4.9.7) instead of advancing further. For wounds on vital locations (head, chest) the final progression stage is Lethal, which causes immediate death.
+- **Progressive wounds** — cannot stack. Each progressive wound occupies a single slot per body location. If a character already has a progressive wound on a given location and that same location is damaged again, the existing wound advances to the next severity stage rather than a new instance being added. Progressive wounds move through a fixed sequence of stages (e.g. Light → Medium → Severe). When the final stage is reached and further progression is triggered, the character becomes **Incapacitated** (see Section 4.9.6) instead of advancing further. For wounds on vital locations (head, chest) the final progression stage is Lethal, which causes immediate death.
 
 - **Special wounds** — applied as discrete status effects outside the progressive or stackable systems. They behave like stackable wounds in that multiple instances can be active simultaneously, but they represent specific injury types tied to particular damage sources. Example: *Animal Bite* (−20 max health), applied by animal attacks. Each bite is a separate instance. A human-like character can sustain 5–6 simultaneous animal bites before their effective maximum health reaches zero.
 
@@ -711,7 +711,7 @@ Lethal wounds are the terminal stage of progressive wound sequences on vital bod
 
 #### 5.3.8 Wound-Triggered Incapacitation
 
-When a progressive wound is at its final non-lethal stage and damage forces it to progress further, the character becomes **Incapacitated**. The initial charge count is determined by the standard incapacitation formula (see Section 4.9.7), using the character's current effective health and base health at the moment the wound progression is triggered. If the character's current effective health is zero or below at the moment of triggering — meaning wound penalties have already reduced them to a lethal state — the character dies instead of becoming Incapacitated, and the formula is not evaluated. Incapacitation depletes automatically each turn and is removed when charges reach zero — the character then regains consciousness. Other characters can still interact with an Incapacitated character (e.g. to move them or administer treatment) while the status is active.
+When a progressive wound is at its final non-lethal stage and damage forces it to progress further, the character becomes **Incapacitated**. The initial charge count is determined by the standard incapacitation formula (see Section 4.9.6), using the character's current effective health and base health at the moment the wound progression is triggered. If the character's current effective health is zero or below at the moment of triggering — meaning wound penalties have already reduced them to a lethal state — the character dies instead of becoming Incapacitated, and the formula is not evaluated. Incapacitation depletes automatically each turn and is removed when charges reach zero — the character then regains consciousness. Other characters can still interact with an Incapacitated character (e.g. to move them or administer treatment) while the status is active.
 
 The wound that triggered Incapacitation remains active and continues accumulating charges while the character is unconscious. If the wound is not treated before its charges reach the progression threshold again, Incapacitation is applied a second time immediately after the character regains consciousness — or sooner, if the threshold is crossed while the character is still unconscious. This creates a recurring collapse cycle for neglected final-stage wounds and provides a strong mechanical incentive to treat the wound during the window when the character is incapacitated and accessible.
 
