@@ -74,3 +74,19 @@ Each object is displayed with the following properties:
 Known and located objects in the Zone objects panel can be interacted with. When a player clicks on an object it must display a dropdown menu with all possible actions that a currently selected character can perform on that object (characters are selected in the Groups panel). If a player clicks on an option of the actions dropdown menu - that action is added to the tasks list of the currently selected characters Group with the currently selected character as an assignee at the bottom of the task list queue.
 
 # Test scenario
+
+For testing purposes a Zone with the following contents must be displayed:
+
+- Group named "Test 1" with characters Bob and Alice in it
+- It has two random tasks in its task queue, Bob is assigned to one of them, Alice is not assigned to any of them
+- 36 objects including random assortment of "Rocks" and "Trees" with random visibility values must be generated and displayed in their corresponding Zone Objects panel sections (known and located ones, since the player can not see undiscovered objects but only generic text there)
+- Group named "Enemy Test 2" with character Wolf in it, this group has no tasks and does not belong to the players faction
+
+All Trees must be displayed with dark-green placeholder squares instead of their icons.
+
+All Rocks must be displayed with dark-grey placeholder squares instead of their icons.
+
+All characters must be displayed with blue placeholder diamond-shaped placeholders instead of their icons.
+
+Every character has material "Meat". Every tree has material "Wood". Every rock has material "Stone". Trees might have a random value between 1 and 3 of an item "Wood" in their content or have none. Every stone might have a random value between 1 and 3 of an item "Iron" in their content or have none. Characters have an item "Sword" in their contents. Wolf has nothing in its content.
+
