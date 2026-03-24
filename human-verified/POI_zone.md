@@ -43,7 +43,9 @@ Group panel displays groups. Each group is a large structure with the following 
 
 Whenever a player hovers over a group its tasks are displayed in the leftmost "Group task queue" section. Whenever a player hovers over a character in a group - those tasks that are assigned to the character are highlighted in the Group task queue.
 
-Whenever the player clicks on a character portrait - that characters tasks become highlighted in the Group task queue and stay highlighted until the character is deselected and an object from the Zone objects panel which is the target of the current task being performed by that character (if there is one) is highlighted in the Zone objects panel - the Zone objects panel must be scrolled to that highlighted object if necessary. If the character is not assigned to any tasks - nothing happens. Zone objects scrolling only happens once when a player clicks on a character portrait. After that the player can scroll Zone objects panel however he wants. If a player clicks on an already selected character - Zone objects are scrolled to the target of the task that character is assigned to once again.
+Whenever the player clicks on a character portrait - that character becomes selected and stays selected until a player clicks on an empty space. That characters tasks become highlighted in the Group task queue and stay highlighted until the character is deselected and an object from the Zone objects panel which is the target of the current task being performed by that character (if there is one) is highlighted in the Zone objects panel - the Zone objects panel must be scrolled to that highlighted object if necessary. If the character is not assigned to any tasks - nothing happens. Zone objects scrolling only happens once when a player clicks on a character portrait. After that the player can scroll Zone objects panel however he wants. If a player clicks on an already selected character - Zone objects are scrolled to the target of the task that character is assigned to once again.
+
+Selected characters must become highlighted and they stay highlighted for as long as the character is the currently selected one.
 
 # Zone objects panel
 
@@ -66,3 +68,9 @@ Each object is displayed with the following properties:
 - Size (in game units, static objects property)
 - Material (resource type, displayed only for objects with 100% visibility), to the left of the objects size
 - Content (objects inventory, displayed only for objects with 100% visibility), to the left of the objects material
+
+# Object interactions
+
+Known and located objects in the Zone objects panel can be interacted with. When a player clicks on an object it must display a dropdown menu with all possible actions that a currently selected character can perform on that object (characters are selected in the Groups panel). If a player clicks on an option of the actions dropdown menu - that action is added to the tasks list of the currently selected characters Group with the currently selected character as an assignee at the bottom of the task list queue.
+
+# Test scenario
