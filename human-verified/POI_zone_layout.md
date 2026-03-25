@@ -82,6 +82,7 @@ Known and located objects in the Zone objects panel can be interacted with. When
 - When a player clicks on an object it must display a dropdown menu with all possible actions that a currently selected character can perform on that object (characters are selected in the Groups panel). If a player clicks on an option of the actions dropdown menu - that action is added to the tasks list of the currently selected characters Group with the currently selected character as an assignee at the bottom of the task list queue.
 - When a player hover over a character in the Group panel - that character, Tasks it is assigned to and Objects which are targets of the tasks that character has as a Task must be highlighted.
 - All highlighted objects, tasks and characters must be deselected or highlighting must be cleared from them once a player clicks on an empty space.
+- When player clicks on a Group in the Groups panel - that group becomes selected and its tasklist is displayed on the left side in the Task List queue
 
 # Test scenario
 
