@@ -292,9 +292,19 @@ Zone-wide actions have no specific object as a target ("Move to" action targets 
 - **Move to** — an action that targets an adjacent Zone of the same POI. A character can not enter another Zone on its own, instead the progress of performing the "Move to" action stops at a full progress bar and the character remains in that state until all other characters of the Group will perform the same action to full completion. The whole Group moves to a new Zone of the POI when all its characters performed the "Move to" action fully. If a character cancels the execution of the "Move to" action as the result of some instruction (such as the need to rest) - that character would need to perform the "Move to" action again starting from zero completion level.
 - **Wait** — hold position doing nothing.
 
-### 4.6 Object Interactions
+### 4.6 Objects and Object Interactions
 
 >NOTE: Actions in this section are game mechanics and pieces of game logic. Characters perform actions. They are not player interactions. Players can not invoke actions directly. Players assign tasks (for Groups or Characters within these Groups) and tasks result in Characters performing actions.
+
+Most of the gameplay revolves around Objects located in POI Zones. Each non-living Object in a POI Zone has the following properties:
+- Size - determines whether the object can be picked (i.e. transformed into an item in the characters inventory).
+- Icon - displayed in the Zone Layout.
+- Name - flavourful description of the object, provides with some information about the object (not necessarily useful or correct) e.g. Old Oak.
+- Type - identifies the type of the object e.g. Tree.
+- Material - a list of items that could be extracted from the object through the "Harvest" action. Living characters can not be harvested but they may display meat/fish/fur or whatever resources can be harvested from their type of corpse.
+- Content - inventory of the object that can be interacted with through "Loot" or "Gather resources" actions depending on the object type.
+- Tags - object-specific modifications of the object properties or identifiers for tag-specific actions.
+- Status effects - a list of effects that govern the state of an object. Living characters may have "Hunger" or "Wounds" that govern their life cycle, non-living objects like trees may passively grow "Propagate" which can then create a new Tree object. Object conditions may also be expressed through status effects, e.g. half-broken building may have status effect "Broken" charged to 100 points out of 200 max.
 
 Object interactions require a specific target. A target must be in the Located state before any object interaction can be assigned, with one exception: a group may be assigned to **"Search for"** a Known object, which applies a focused visibility increase to that specific object on each execution and a smaller secondary increase to a random set of other objects in the zone. See the "Search for" entry below for the full numeric mechanic.
 
