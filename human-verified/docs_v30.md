@@ -302,7 +302,9 @@ Object interactions are divided into four subcategories:
 
 **Common actions** — applicable to most or all objects:
 - **Take** — pick up the object and place it in a character's inventory. Requires sufficient free inventory capacity. Cannot be applied to objects too large to carry.
-- **Gather resources** — extract usable material from the object (e.g. harvesting from a plant, stripping a carcass). Can be performed without tools but is significantly faster if a compatible tool is present.
+- **Gather resources** — extract items from the objects "content" without destroying it. 
+- **Harvest** — destroys the object and places its "material" items into the inventory of a character who performed the action. If the object had items in its "content" - these items are discarded.
+- **Loot** - manipulates the objects "content" property allowing a free exchange between the characters inventory and the inventory of the objects "content" i.e. a character can withdraw any items from the "content" or place any items in the "content" of the object.
 - **Examine** — planned for future releases. Currently a placeholder.
 - **Conceal** — planned for future releases. Currently a placeholder.
 - **Search for** (Known objects only) — direct the group's effort toward locating a specific Known object. The Search for action produces no passive per-attempt tick — action point investments during progress accumulation apply no visibility increase to any object. On full execution the following steps are applied:
