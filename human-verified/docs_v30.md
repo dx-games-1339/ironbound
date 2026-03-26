@@ -306,6 +306,10 @@ Most of the gameplay revolves around Objects located in POI Zones. Each non-livi
 - Tags - object-specific modifications of the object properties or identifiers for tag-specific actions.
 - Status effects - a list of effects that govern the state of an object. Living characters may have "Hunger" or "Wounds" that govern their life cycle, non-living objects like trees may passively grow "Propagate" which can then create a new Tree object. Object conditions may also be expressed through status effects, e.g. half-broken building may have status effect "Broken" charged to 100 points out of 200 max.
 
+Object interactions are actions that can be performed by living characters on those objects. Which actions can be performed on an object is determined by the type of that object and the type of character performing the action. Some actions may require additional conditions to be met (e.g. a tool with specific tag).
+
+Non-living objects do not perform actions themselves. If a non-living object is supposed to interact with the game world - it must be performed through a changing status effect on that object.
+
 Object interactions require a specific target. A target must be in the Located state before any object interaction can be assigned, with one exception: a group may be assigned to **"Search for"** a Known object, which applies a focused visibility increase to that specific object on each execution and a smaller secondary increase to a random set of other objects in the zone. See the "Search for" entry below for the full numeric mechanic.
 
 Object interactions are divided into four subcategories:
