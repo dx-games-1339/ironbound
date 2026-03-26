@@ -308,6 +308,8 @@ Most of the gameplay revolves around Objects located in POI Zones. Each non-livi
 
 Object interactions are actions that can be performed by living characters on those objects. Which actions can be performed on an object is determined by the type of that object and the type of character performing the action. Some actions may require additional conditions to be met (e.g. a tool with specific tag).
 
+Living characters are treated as parts of a group. Group is treated as a single object and individual characters within that group can not be interacted with by other Groups. Characters within that Group are also discovered together via the Group visibility characteristic and their inventories are displayed in the "content" property of the Group once its visibility reaches 100%. Dead characters are automatically removed from their Group and transformed into a non-living corpse object which is then discovered as a separate object, not a part of the Group that the character belonged to before death.
+
 Non-living objects do not perform actions themselves. If a non-living object is supposed to interact with the game world - it must be performed through a changing status effect on that object.
 
 Object interactions require a specific target. A target must be in the Located state before any object interaction can be assigned, with one exception: a group may be assigned to **"Search for"** a Known object, which applies a focused visibility increase to that specific object on each execution and a smaller secondary increase to a random set of other objects in the zone. See the "Search for" entry below for the full numeric mechanic.
